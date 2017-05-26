@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingStart="@dimen/goalkeeper_paddingsize_large"
+        android:gravity="center_vertical">
+
+        <TableLayout
+            android:layout_width="@dimen/overviewplayer_size_large"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+        <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+            android:id="@+id/p1"
+            android:layout_width="@dimen/overviewplayer_size_large"
+            android:layout_height="@dimen/overviewplayer_size_large"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"/>
+
+        </TableLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/lines4_line1_paddingsize_large">
+
+        <TableLayout
+            android:layout_width="@dimen/overviewplayer_size_large"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p3"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p2"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p5"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p6"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+        </TableLayout>
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/lines4_line2_paddingsize_large">
+
+        <TableLayout
+            android:layout_width="@dimen/overviewplayer_size_large"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p11"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p8"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p4"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p7"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+        </TableLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/lines4_line3_paddingsize_large">
+
+        <TableLayout
+            android:layout_width="@dimen/overviewplayer_size_large"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p9"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+            <de.uni_erlangen.wi1.footballdashboard.UI_Components.Views.PlayerView
+                android:id="@+id/p10"
+                android:layout_width="@dimen/overviewplayer_size_large"
+                android:layout_height="@dimen/overviewplayer_size_large"
+                android:layout_margin="5dp"
+                android:layout_weight=".20"/>
+
+        </TableLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/playerCard"
+                android:layout_width="10dp"
+                android:layout_height="12.5dp"
+                android:layout_gravity="top|left"
+                android:background="@drawable/indication_yellowcard"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/playerCaptain"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="top|right"
+                android:background="@drawable/indication_captain"
+                android:includeFontPadding="false"
+                android:text=" C"
+                android:textColor="#FFF"
+                android:textSize="13dp"
+                android:visibility="gone"/>
+
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/playerImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:gravity="center"
+                android:src="@drawable/lloris"
+                app:civ_border_width="3dp"
+                app:civ_shadow="true"
+                app:civ_shadow_radius="3"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/playerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:gravity="center_horizontal"
+            android:text="H. LLoris"/>
+
+    </TableLayout>
+
+</merge>

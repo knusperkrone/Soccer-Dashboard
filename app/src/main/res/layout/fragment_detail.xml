@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+
+    <include layout="@layout/detaillist"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableLayout
+            android:layout_width="450dp"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/details_card"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dataheader_size_large"
+                android:layout_marginBottom="3dp"
+                android:background="#FFF"
+                android:padding="10dp"
+                app:cardElevation="1.5dp"
+                app:cardUseCompatPadding="true">
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/details_tablayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:tabIndicatorHeight="4dp"
+                    app:tabMode="fixed"
+                    app:tabPadding="2dp"/>
+
+            </android.support.v7.widget.CardView>
+
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/playerdetailview_card"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="3dp"
+                android:background="#FFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:padding="10dp"
+                app:cardElevation="1.5dp"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="10dp">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/playerdetail_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </android.support.v7.widget.CardView>
+
+        </TableLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/fragment_detail_playerinfo"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dataheader_size_large"/>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/playerdetail_card"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="3dp"
+                android:background="#FFF"
+                android:padding="10dp"
+                app:cardElevation="1.5dp"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="10dp">
+
+                <ListView
+                    android:id="@+id/playerdetail_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimaryDark"/>
+            </android.support.v7.widget.CardView>
+
+        </TableLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

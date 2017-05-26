@@ -1,0 +1,37 @@
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="mainlist_size_normal">100dp</dimen>
+    <dimen name="mainlist_size_large">150dp</dimen>
+    <dimen name="mainlist_size_xlarge">200dp</dimen>
+
+    <dimen name="dataheader_size_normal">70dp</dimen>
+    <dimen name="dataheader_size_large">90dp</dimen>
+    <dimen name="dataheader_size_xlarge">95dp</dimen>
+
+    <dimen name="overviewplayer_size_normal">70dp</dimen>
+    <dimen name="overviewplayer_size_large">90dp</dimen>
+    <dimen name="overviewplayer_size_xlarge">100dp</dimen>
+
+    <dimen name="goalkeeper_paddingsize_nomal">15dp</dimen>
+    <dimen name="goalkeeper_paddingsize_large">25dp</dimen>
+    <dimen name="goalkeeper_paddingsize_xlarge">35dp</dimen>
+    
+    <dimen name="lines4_line1_paddingsize_normal">60dp</dimen>
+    <dimen name="lines4_line1_paddingsize_large">75dp</dimen>
+    <dimen name="lines4_line1_paddingsize_xlarge">90dp</dimen>
+
+    <dimen name="lines4_line2_paddingsize_normal">75dp</dimen>
+    <dimen name="lines4_line2_paddingsize_large">90dp</dimen>
+    <dimen name="lines4_line2_paddingsize_xlarge">120dp</dimen>
+
+    <dimen name="lines4_line3_paddingsize_normal">40dp</dimen>
+    <dimen name="lines4_line3_paddingsize_large">55dp</dimen>
+    <dimen name="lines4_line3_paddingsize_xlarge">70dp</dimen>
+
+</resources>

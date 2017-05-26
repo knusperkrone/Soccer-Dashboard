@@ -1,0 +1,21 @@
+apply plugin: 'android-library'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.0.0'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        minSdkVersion 4
+        targetSdkVersion 19
+
+    }
+}
+

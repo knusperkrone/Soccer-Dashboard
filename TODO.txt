@@ -1,0 +1,36 @@
+SPEZIFIKATION:
+
+- „Übersichtslayout“ und „Datenlayout“  durch Swipen nach oben/unten
+- Swipe nach links Einstellungsmenu(NavDrawer)
+
+
+- „Übersichtlayout“
+	- Spielfeld samt Spielern im Aufstellung
+	- Aufstellung verschiebbar (Wenn Zeit ist)
+	- Unten Schiebregler für Zeit
+	- Schiebregler zeigt Wechsel (Spieler|Aufstellung) an
+	- Auf klickt auf Schiebregler öffnet sich eine Menu (langsamer,PAUSE/PLAY, schneller)
+	- Oben Zeit, Spielstand, Auswechsel-Counter (count--)
+	- Spielerfoto, Name, Nummer
+	- Klick auf Spieler öffnet „Datenlayout“ mit Spieler
+	- Gelbes Symbol für (Gelbe) Karte
+	- Kreuz für rote Karte
+	- Verletzt Markieurng
+	- Kaptain Markierung
+	- Ausklappbare Liste mit Events mit ausgang, details sind qualifier
+	- Liste ist filterbar
+
+
+- „Datenlayout“
+	- Links sortierte Liste mit, allen Spielern
+	- Pfeil für Änderung in der Liste
+	- Kein Spieler gewählt, Gesamtstatistik
+	- Positionswechsel in Statistik
+	- TODO: Daten analysieren, Statistik Brainstorm
+
+
+TODO:
+- BEIDE TEAMS?
+- WIE WIRD DAS BERECHNET? REGELN?!
+- WIE SIE DAS DANN BRAUCHT?
+- FOTOS?
