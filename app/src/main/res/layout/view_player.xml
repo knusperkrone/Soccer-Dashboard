@@ -18,7 +18,7 @@
                 android:id="@+id/playerCard"
                 android:layout_width="10dp"
                 android:layout_height="12.5dp"
-                android:layout_gravity="top|left"
+                android:layout_gravity="top|start"
                 android:background="@drawable/indication_yellowcard"
                 android:visibility="gone"/>
 
@@ -26,7 +26,7 @@
                 android:id="@+id/playerCaptain"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
-                android:layout_gravity="top|right"
+                android:layout_gravity="top|end"
                 android:background="@drawable/indication_captain"
                 android:includeFontPadding="false"
                 android:text=" C"
@@ -36,8 +36,8 @@
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/playerImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/player_image_size_large"
+                android:layout_height="@dimen/player_image_size_large"
                 android:clickable="true"
                 android:gravity="center"
                 android:src="@drawable/lloris"
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:gravity="center_horizontal"
-            android:text="H. LLoris"/>
+            android:maxLines="1"/>
 
     </TableLayout>
 

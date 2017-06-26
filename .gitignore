@@ -24,6 +24,9 @@ idea/workspace.xml
 .idea/libraries
 
 .DS_Store
-/build
-/captures
+build
+captures
+libs
+app/src/main/assets/
+
 .externalNativeBuild

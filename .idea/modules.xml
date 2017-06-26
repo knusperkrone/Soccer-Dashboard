@@ -3,11 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FootballDashboard.iml" filepath="$PROJECT_DIR$/FootballDashboard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/HeatMapLib/HeatMapLib.iml" filepath="$PROJECT_DIR$/libs/HeatMapLib/HeatMapLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/MPChartLib/MPChartLib.iml" filepath="$PROJECT_DIR$/libs/MPChartLib/MPChartLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/VerticalViewPager/VerticalViewPager.iml" filepath="$PROJECT_DIR$/libs/VerticalViewPager/VerticalViewPager.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/circleimageview/circleimageview.iml" filepath="$PROJECT_DIR$/libs/circleimageview/circleimageview.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/circularimageview/circularimageview.iml" filepath="$PROJECT_DIR$/libs/circularimageview/circularimageview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/expandablerecyclerview-3.0.0-RC1/expandablerecyclerview-3.0.0-RC1.iml" filepath="$PROJECT_DIR$/libs/expandablerecyclerview-3.0.0-RC1/expandablerecyclerview-3.0.0-RC1.iml" />
     </modules>
   </component>
 </project>

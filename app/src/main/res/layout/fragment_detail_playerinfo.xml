@@ -1,77 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/playerInfo_cardView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="3dp"
-    android:background="#FFF"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:padding="10dp"
-    app:cardElevation="1.5dp"
-    app:cardUseCompatPadding="true"
-    app:contentPadding="5dp">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TableLayout
+        android:layout_width="650dp"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/details_playername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:text="PLAYER NAME"
-            android:textColor="#000"
-            android:textStyle="bold"/>
+        <android.support.v7.widget.CardView
+            android:id="@+id/details_player_card_tab"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dataheader_size_large"
+            android:layout_marginBottom="3dp"
+            android:background="#FFF"
+            android:padding="10dp"
+            app:cardElevation="1.5dp"
+            app:cardUseCompatPadding="true">
 
-        <TextView
-            android:id="@+id/details_playerpos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/details_playername"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="5dp"
-            android:text="POSITION"
-            android:textColor="#000"
-            android:textStyle="italic"/>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/details_player_tab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:tabIndicatorHeight="4dp"
+                app:tabMode="fixed"
+                app:tabPadding="2dp"/>
 
-        <TextView
-            android:id="@+id/details_playernum"
-            android:layout_width="wrap_content"
-            android:layout_height="80dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/details_playername"
-            android:gravity="center_vertical"
-            android:text="22"
-            android:textColor="#000"
-            android:textSize="25dp"/>
+        </android.support.v7.widget.CardView>
 
-        <ImageView
-            android:layout_toRightOf="@id/details_playernum"
-            android:id="@+id/details_playercard"
-            android:layout_width="wrap_content"
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/details_player_card_viewpager"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:src="@drawable/yellow_card"/>
+            android:layout_marginBottom="3dp"
+            android:background="#FFF"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="10dp"
+            app:cardElevation="1.5dp"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="10dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/lloris"
-            app:civ_border="true"
-            app:civ_border_color="#E8E8E8"
-            app:civ_border_width="2dp"/>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/details_player_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
-    </RelativeLayout>
+        </android.support.v7.widget.CardView>
 
-</android.support.v7.widget.CardView>
+    </TableLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/details_player_card_playerinfo"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dataheader_size_large"
+            android:layout_marginBottom="3dp"
+            android:background="#FFF"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="10dp"
+            app:cardElevation="1.5dp"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="5dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/details_player_info_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/details_player_info_pos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/details_player_info_name"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:textColor="#000"
+                    android:textStyle="italic"/>
+
+                <TextView
+                    android:id="@+id/details_player_info_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/details_player_info_name"
+                    android:textColor="#000"
+                    android:textSize="25dp"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/details_player_info_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    app:civ_border="true"
+                    app:civ_border_width="2dp"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/details_player_card_playerlist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="3dp"
+            android:background="#FFF"
+            android:padding="10dp"
+            app:cardElevation="1.5dp"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="10dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/details_player_playerlist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </android.support.v7.widget.CardView>
+
+    </TableLayout>
+
+</LinearLayout>

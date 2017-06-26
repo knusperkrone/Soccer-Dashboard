@@ -3,8 +3,13 @@ include ':circularimageview'
 include ':circleimageview'
 include ':MPChartLib'
 include ':VerticalViewPager'
+include ':HeatMapLib'
+include ':expandablerecyclerview-3.0.0-RC1'
+
 
 project(':circularimageview').projectDir = new File('libs/circularimageview')
 project(':circleimageview').projectDir = new File('libs/circleimageview')
 project(':MPChartLib').projectDir = new File('libs/MPChartLib')
 project(':VerticalViewPager').projectDir = new File('libs/VerticalViewPager')
+project(':HeatMapLib').projectDir = new File('libs/HeatMapLib')
+project(':expandablerecyclerview-3.0.0-RC1').projectDir = new File('libs/expandablerecyclerview-3.0.0-RC1')

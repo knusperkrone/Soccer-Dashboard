@@ -4,7 +4,10 @@
               android:layout_height="match_parent"
               android:orientation="horizontal">
 
-    <include layout="@layout/detaillist"/>
+    <FrameLayout
+        android:id="@+id/overview_list_placeholder"
+        android:layout_width="@dimen/mainlist_size_large"
+        android:layout_height="match_parent"/>
 
     <TableLayout
         android:layout_width="match_parent"

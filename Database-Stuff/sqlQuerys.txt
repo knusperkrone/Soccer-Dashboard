@@ -1,0 +1,48 @@
+# List Game
+SELECT Game.ID, thome.ID as homeID, thome.Name as homeTeam ,taway.ID as awayID, taway.Name as awayTeam
+FROM Game
+JOIN Team as thome
+	ON  Game.ID_Team_home = thome.ID 
+JOIN Team as taway
+	ON  Game.ID_Team_away = taway.ID 
+	
+WHERE Game.ID = ?
+
+# Get Players for Team
+SELECT gp.ID_Player, gp.Status, gp.ShirtNumber, gp.Captain, p.FirstName, p.KnownName, p.LastName
+FROM GamePlayer as gp
+JOIN Player as p
+	ON gp.ID_Player == p.ID
+WHERE 	
+	ID_GAME == ?
+	AND ID_TEAM == ?
+
+
+#Get MetaData
+SELECT ID_Event, Period, min, sec, ID_Player, ID_Team, Outcome, X_Coord, Y_Cood, Qualifier_Id, Value
+FROM EventData
+JOIN Qualifier
+	ON EventData.ID_Qualifier == Qualifier.ID
+
+WHERE 
+	ID_Game == ?
+	AND period > 2
+	
+ORDER BY period, Min, Sec, ID_EVENT
+
+
+#Get PlayData
+SELECT ID_Event, Period, min, sec, ID_Player, ID_Team, Outcome, X_Coord, Y_Cood, Qualifier_Id, Value
+FROM EventData
+JOIN Qualifier
+	ON EventData.ID_Qualifier == Qualifier.ID
+
+WHERE 
+	ID_Game == ?
+	AND period <= 2
+	
+ORDER BY period, Min, Sec, ID_EVENT
+
+
+
+# Random gameId = 838507

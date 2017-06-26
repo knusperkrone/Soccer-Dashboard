@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/statusBar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cardview_light_background"
-    android:gravity="center_horizontal"
-    android:text="0:0"/>
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/statusbar_team"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
+
+    <TextView
+        android:id="@+id/statusbar_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="00:00"/>
+
+    <TextView
+        android:id="@+id/statusbar_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="0:0"/>
+
+</LinearLayout>

@@ -10,18 +10,16 @@
     android:screenOrientation="sensorLandscape"
     tools:openDrawer="start">
 
-
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <include layout="@layout/statusbar" />
+        <include layout="@layout/statusbar"/>
 
-
-    <fr.castorflex.android.verticalviewpager.VerticalViewPager
-        android:id="@+id/main_viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <fr.castorflex.android.verticalviewpager.VerticalViewPager
+            android:id="@+id/main_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </TableLayout>
 

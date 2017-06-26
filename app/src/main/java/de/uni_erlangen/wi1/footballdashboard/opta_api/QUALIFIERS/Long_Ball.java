@@ -1,0 +1,21 @@
+package de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS;
+
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+
+/**
+ * Created by knukro on 5/22/17.
+ */
+
+public class Long_Ball extends OPTA_Qualifier
+{
+    public Long_Ball(String value)
+    {
+        super(value);
+    }
+
+    @Override
+    public int getId()
+    {
+        return 0;
+    }
+}
