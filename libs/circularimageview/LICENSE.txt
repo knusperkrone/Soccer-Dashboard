@@ -1,0 +1,1 @@
+CircularImageView by Lopez Mikhael is licensed under a Apache License 2.0.
