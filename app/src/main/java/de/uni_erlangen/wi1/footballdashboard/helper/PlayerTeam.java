@@ -4,7 +4,9 @@ import android.util.SparseArray;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
 
@@ -17,8 +19,12 @@ public class PlayerTeam
     private final String name;
 
     private final SparseArray<OPTA_Player> playerSparseArray;
+
+    private List<OPTA_Event> events;
+
     private PlayerView[] playerViews;
     private OPTA_Player[] rankedPlayers;
+
 
     public PlayerTeam(int teamId, String name, boolean homeTeam)
     {
@@ -28,20 +34,25 @@ public class PlayerTeam
         this.playerSparseArray = new SparseArray<>(11);
     }
 
-    public boolean prepHeatMap(PlayerView selectedView)
+    public boolean setClicked(PlayerView selectedView)
     {
+        /* Only selected view is clicked and returns
+           true if player is already selected  */
         for (PlayerView currView : playerViews) {
             if (currView == selectedView) {
-                if (currView.isHeatmapMode()) { // Already clicked
-                    currView.setDefaultMode();
-                    return false;
-                }
-                currView.setHeatmapMode();
+                if (selectedView.isClickedMode())
+                    return true;
+                currView.setClickedMode();
             } else {
                 currView.setDefaultMode();
             }
         }
-        return true;
+        return false;
+    }
+
+    public void setUnclicked(PlayerView selectedView)
+    {
+        selectedView.setDefaultMode();
     }
 
     public void setViews(PlayerView[] playerViews)
@@ -91,24 +102,30 @@ public class PlayerTeam
         }
     }
 
+    public List<OPTA_Event> getEvents()
+    {
+        return events;
+    }
+
+    public void setEvents(List<OPTA_Event> events)
+    {
+        this.events = events;
+    }
+
 
     public SparseArray<OPTA_Player> getPlayers()
     {
         return playerSparseArray;
     }
 
-    public void sortRankedPlayers() {
+    public void sortRankedPlayers()
+    {
         Arrays.sort(rankedPlayers);
     }
 
     public OPTA_Player[] getRankedPlayers()
     {
         return rankedPlayers;
-    }
-
-    public void setRankedPlayers(OPTA_Player[] rankedPlayers)
-    {
-        this.rankedPlayers = rankedPlayers;
     }
 
     private void mapViewToPlayerData()
@@ -150,6 +167,11 @@ public class PlayerTeam
     public int getId()
     {
         return teamId;
+    }
+
+    public boolean isHomeTeam()
+    {
+        return homeTeam;
     }
 
 }

@@ -1,7 +1,10 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.custom_views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +26,8 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 public class PlayerView extends LinearLayout
 {
 
+    Paint paint = new Paint();
+
     public CircularImageView playerImage;
     private TextView playerName;
     private TextView indicatorCaptain;
@@ -37,6 +42,7 @@ public class PlayerView extends LinearLayout
     public PlayerView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+        paint.setColor(Color.BLACK);
         init();
     }
 
@@ -148,6 +154,11 @@ public class PlayerView extends LinearLayout
                 //playerImage.setImageDrawable(); //TODO: Set default image
             }
         }
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        canvas.drawLine(0, 50, 350, 50, paint);
     }
 
     public boolean isHeatmapMode()
