@@ -21,4 +21,12 @@ public class Player_Changed_Position extends OPTA_Event
         return API_TYPE_IDS.PLAYER_CHANGED_POSITION;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        //Todo: wohin ist der Spieler gewechselt?
+        return gov.getPlayerName(playerId) + " changed position";
+    }
+
 }

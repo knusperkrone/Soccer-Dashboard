@@ -21,4 +21,10 @@ public class Turnover extends OPTA_Event
         return API_TYPE_IDS.TURNOVER;
     }
 
+    @Override
+    public String getDescription()
+    {
+         return "Event is no longer used";
+    }
+
 }

@@ -21,4 +21,11 @@ public class Challenge extends OPTA_Event
         return API_TYPE_IDS.CHALLENGE;
     }
 
+    //outcome is always set to 0
+    @Override
+    public String getDescription()
+    {
+        return "Unsuccessful challenge by " + gov.getPlayerName(playerId);
+    }
+
 }

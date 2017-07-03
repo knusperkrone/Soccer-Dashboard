@@ -21,4 +21,10 @@ public class Ball_Touch extends OPTA_Event
         return API_TYPE_IDS.BALL_TOUCH;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + (outcome ? " unsuccessfully controlled the ball" : " was hit by the ball");
+    }
+
 }

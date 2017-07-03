@@ -21,4 +21,11 @@ public class Format_Change extends OPTA_Event
         return API_TYPE_IDS.FORMATION_CHANGE;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Formation changed";
+    }
+
 }

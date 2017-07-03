@@ -21,4 +21,10 @@ public class Goal extends OPTA_Event
         return API_TYPE_IDS.GOAL;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Goal by " + gov.getPlayerName(playerId);
+    }
 }

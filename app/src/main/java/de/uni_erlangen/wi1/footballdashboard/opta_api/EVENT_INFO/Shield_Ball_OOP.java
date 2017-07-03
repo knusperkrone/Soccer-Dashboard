@@ -21,4 +21,11 @@ public class Shield_Ball_OOP extends OPTA_Event
         return API_TYPE_IDS.SHIELD_BALL_OPP;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " shielded the ball from opponent";
+    }
+
 }

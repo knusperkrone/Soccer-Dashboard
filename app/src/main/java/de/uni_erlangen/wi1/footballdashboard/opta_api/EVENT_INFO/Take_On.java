@@ -2,6 +2,8 @@ package de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Overrun;
 
 /**
  * Created by knukro on 5/22/17.
@@ -21,4 +23,13 @@ public class Take_On extends OPTA_Event
         return API_TYPE_IDS.TAKE_ON;
     }
 
+    @Override
+    public String getDescription() {
+        for (OPTA_Qualifier q : qualifiers) {
+            if (q instanceof Overrun) {
+                return "Successful take on by " + gov.getPlayerName(playerId) + " ,but player lost the ball";
+            }
+        }
+        return (((outcome) ? "Unsuccessful" : "Successful") + " Take on by " + gov.getPlayerName(playerId));
+    }
 }

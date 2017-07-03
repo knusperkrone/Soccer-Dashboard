@@ -21,4 +21,24 @@ public class Start extends OPTA_Event
         return API_TYPE_IDS.START;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        switch(period_id) {
+            case 1:
+                return "First half started";
+            case 2:
+                return "Second half started";
+            case 3:
+                return "First period of extra time started";
+            case 4:
+                return "Second period of extra time started";
+            case 5:
+                return "Penalty shoot out started";
+            default:
+                return "Match period started";
+        }
+    }
+
 }

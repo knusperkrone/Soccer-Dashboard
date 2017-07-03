@@ -21,4 +21,11 @@ public class Ball_Recovery extends OPTA_Event
         return API_TYPE_IDS.BALL_RECOVERY;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " won possession of the ball";
+    }
+
 }

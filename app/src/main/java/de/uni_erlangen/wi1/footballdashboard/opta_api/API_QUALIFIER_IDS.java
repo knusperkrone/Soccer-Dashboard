@@ -124,6 +124,10 @@ public class API_QUALIFIER_IDS
 
     // FOUL AND CARD EVENTS
     // EVENTS: 4(FOUL) - except for cards
+    public static final int HAND = 10;
+    public static final int YELLOW_CARD = 31;
+    public static final int SECOND_YELLOW = 32;
+    public static final int RED_CARD = 33;
     public static final int RESCINDED_CARD = 171;
     public static final int NO_IMPACT_ON_TIMING = 172;
     public static final int DISSIENT = 184;

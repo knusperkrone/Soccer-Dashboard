@@ -21,4 +21,12 @@ public class Team_Set_up extends OPTA_Event
         return API_TYPE_IDS.TEAM_SET_UP;
     }
 
+    /*
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        Todo
+    }
+    */
 }

@@ -18,4 +18,9 @@ public class Long_Ball extends OPTA_Qualifier
     {
         return 0;
     }
+
+    @Override
+    public String describeContent() {
+        return null;
+    }
 }

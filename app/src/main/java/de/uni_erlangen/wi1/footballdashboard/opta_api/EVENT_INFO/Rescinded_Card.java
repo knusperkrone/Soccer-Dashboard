@@ -21,5 +21,12 @@ public class Rescinded_Card extends OPTA_Event
         return API_TYPE_IDS.RESCINDED_CARD;
     }
 
-
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        //Todo Unterscheidung Gelb/Rot
+        return gov.getPlayerName(playerId) + "; Referee rescinded a card";
+    }
 }
+

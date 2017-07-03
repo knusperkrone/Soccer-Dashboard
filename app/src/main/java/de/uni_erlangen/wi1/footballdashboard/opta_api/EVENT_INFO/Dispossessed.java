@@ -21,4 +21,11 @@ public class Dispossessed extends OPTA_Event
         return API_TYPE_IDS.DISPOSSESSED;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " was tackled and lost the ball";
+    }
+
 }

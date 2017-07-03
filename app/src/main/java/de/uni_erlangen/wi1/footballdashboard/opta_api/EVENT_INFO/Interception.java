@@ -21,4 +21,11 @@ public class Interception extends OPTA_Event
         return API_TYPE_IDS.INTERCEPTION;
     }
 
+
+    // outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " intercepted a pass";
+    }
 }

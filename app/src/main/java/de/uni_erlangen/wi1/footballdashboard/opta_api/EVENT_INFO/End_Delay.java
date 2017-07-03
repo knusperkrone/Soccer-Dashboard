@@ -21,4 +21,11 @@ public class End_Delay extends OPTA_Event
         return API_TYPE_IDS.STOP_DELAY;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Stoppage ended";
+    }
+
 }

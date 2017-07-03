@@ -21,4 +21,10 @@ public class Keeper_Sweeper extends OPTA_Event
         return API_TYPE_IDS.KEEPER_SWEEPER;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + "cleared the ball" + (outcome ? ", but possession changed" : "");
+    }
+
 }

@@ -21,4 +21,10 @@ public class Miss extends OPTA_Event
         return API_TYPE_IDS.MISS;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " shot over the goal";
+    }
 }

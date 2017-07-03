@@ -21,4 +21,10 @@ public class Post extends OPTA_Event
         return API_TYPE_IDS.POST;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " hit the frame of the goal";
+    }
 }

@@ -21,4 +21,11 @@ public class Start_Delay extends OPTA_Event
         return API_TYPE_IDS.START_DELAY;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        //Todo: Eventuell Grund und Spielernummer angeben
+        return "Stoppage in play";
+    }
 }

@@ -21,4 +21,10 @@ public class Claim extends OPTA_Event
         return API_TYPE_IDS.CLAIM;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return outcome ? gov.getPlayerName(playerId) + " dropped the ball after a catch" : gov.getPlayerName(playerId) + " caught the ball";
+    }
+
 }

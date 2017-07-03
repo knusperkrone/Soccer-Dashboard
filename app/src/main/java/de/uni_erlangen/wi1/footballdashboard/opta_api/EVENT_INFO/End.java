@@ -21,4 +21,24 @@ public class End extends OPTA_Event
         return API_TYPE_IDS.END;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        switch(period_id){
+            case 1:
+                return "First half ended";
+            case 2:
+                return "Second half ended";
+            case 3:
+                return "First period of extra time ended";
+            case 4:
+                return "Second period of extra time ended";
+            case 5:
+                return "Penalty shoot out ended";
+            default:
+                return "Match period ended";
+        }
+    }
+
 }

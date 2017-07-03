@@ -21,4 +21,11 @@ public class Official_Change extends OPTA_Event
         return API_TYPE_IDS.OFFICIAL_CHANGE;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Referee or linesman was replaced";
+    }
+
 }

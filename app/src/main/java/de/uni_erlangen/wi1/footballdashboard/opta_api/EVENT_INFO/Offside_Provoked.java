@@ -21,4 +21,11 @@ public class Offside_Provoked extends OPTA_Event
         return API_TYPE_IDS.OFFSIDE_PROVOKED;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " provoked offside";
+    }
+
 }

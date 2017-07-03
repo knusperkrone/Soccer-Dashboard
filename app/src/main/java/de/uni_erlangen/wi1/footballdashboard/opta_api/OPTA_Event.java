@@ -12,7 +12,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Ball_Recovery;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Ball_Touch;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Card;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Challenge;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Change_Missed;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Chance_Missed;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Claim;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Clearance;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Collection_End;
@@ -65,7 +65,7 @@ import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.BALL_R
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.BALL_TOUCH;
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CARD;
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CHALLENGE;
-import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CHANGE_MISSED;
+import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CHANCE_MISSED;
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CLAIM;
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.CLEARANCE;
 import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.COLLECTION_END;
@@ -193,8 +193,8 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
             case CHALLENGE:
                 info = new Challenge(outcome, period_id, min, sec, playerId, teamId, x, y);
                 break;
-            case CHANGE_MISSED:
-                info = new Change_Missed(outcome, period_id, min, sec, playerId, teamId, x, y);
+            case CHANCE_MISSED:
+                info = new Chance_Missed(outcome, period_id, min, sec, playerId, teamId, x, y);
                 break;
             case CLAIM:
                 info = new Claim(outcome, period_id, min, sec, playerId, teamId, x, y);

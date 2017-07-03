@@ -21,4 +21,11 @@ public class Resume extends OPTA_Event
         return API_TYPE_IDS.RESUME;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Match resumed on new Date";
+    }
+
 }

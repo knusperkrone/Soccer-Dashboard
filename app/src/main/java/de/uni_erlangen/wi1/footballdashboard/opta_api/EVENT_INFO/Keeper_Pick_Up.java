@@ -21,4 +21,11 @@ public class Keeper_Pick_Up extends OPTA_Event
         return API_TYPE_IDS.KEEPER_PICK_UP;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " picked up the ball";
+    }
+
 }

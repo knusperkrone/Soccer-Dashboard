@@ -21,4 +21,11 @@ public class Player_Becomes_Goalkeeper extends OPTA_Event
         return API_TYPE_IDS.PLAYER_BECOMES_GOALKEEPER;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " replaced the goalkeeper";
+    }
+
 }

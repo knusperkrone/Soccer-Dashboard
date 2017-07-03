@@ -21,4 +21,11 @@ public class Player_Retired extends OPTA_Event
         return API_TYPE_IDS.PLAYER_RETIRED;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " was forced to leave the game and can't be substituted";
+    }
+
 }

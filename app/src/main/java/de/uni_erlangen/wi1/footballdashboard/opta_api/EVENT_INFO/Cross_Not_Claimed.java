@@ -21,4 +21,11 @@ public class Cross_Not_Claimed extends OPTA_Event
         return API_TYPE_IDS.CROSS_NOT_CLAIMED;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Unsuccessful catch by " + gov.getPlayerName(playerId);
+    }
+
 }

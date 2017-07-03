@@ -21,4 +21,10 @@ public class Out extends OPTA_Event
         return API_TYPE_IDS.OUT;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return outcome ? gov.getPlayerName(playerId) + " kicked the ball out of play" : gov.getPlayerName(playerId) + " gained possession of the ball (out)";
+    }
+
 }

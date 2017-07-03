@@ -2,6 +2,8 @@ package de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Hand;
 
 /**
  * Created by knukro on 5/22/17.
@@ -19,6 +21,17 @@ public class Foul extends OPTA_Event
     public int getID()
     {
         return API_TYPE_IDS.FOUL;
+    }
+
+    @Override
+    public String getDescription()
+    {
+        for (OPTA_Qualifier q : qualifiers) {
+            if (q instanceof Hand) {
+                return "Handball by " + gov.getPlayerName(playerId);
+            }
+        }
+        return outcome ? gov.getPlayerName(playerId) + " was fouled" : "Foul by " + gov.getPlayerName(playerId);
     }
 
 }

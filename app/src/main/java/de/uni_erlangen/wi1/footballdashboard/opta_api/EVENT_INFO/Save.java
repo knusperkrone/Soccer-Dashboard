@@ -21,4 +21,11 @@ public class Save extends OPTA_Event
         return API_TYPE_IDS.SAVE;
     }
 
+    // outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Save by " + gov.getPlayerName(playerId);
+    }
+
 }

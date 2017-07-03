@@ -2,6 +2,8 @@ package de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Injury;
 
 /**
  * Created by knukro on 5/22/17.
@@ -21,4 +23,15 @@ public class Player_Off extends OPTA_Event
         return API_TYPE_IDS.PLAYER_OFF;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        for(OPTA_Qualifier q : qualifiers){
+            if(q instanceof Injury){
+                return gov.getPlayerName(playerId) + " was substituted off because of an injury";
+            }
+        }
+        return gov.getPlayerName(playerId) + " was substituted off";
+    }
 }

@@ -21,4 +21,11 @@ public class Condition_Change extends OPTA_Event
         return API_TYPE_IDS.CONDITION_CHANGE;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "The playing condition changed";
+    }
+
 }

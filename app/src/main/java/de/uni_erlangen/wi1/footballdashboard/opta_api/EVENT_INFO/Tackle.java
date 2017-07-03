@@ -21,4 +21,9 @@ public class Tackle extends OPTA_Event
         return API_TYPE_IDS.TACKLE;
     }
 
+    @Override
+public String getDescription()
+{
+    return outcome ? "Unsuccessful tackle by " + gov.getPlayerName(playerId) : "Unsuccessful tackle by " + gov.getPlayerName(playerId);
+}
 }

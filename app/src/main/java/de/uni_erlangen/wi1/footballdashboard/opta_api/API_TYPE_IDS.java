@@ -60,7 +60,7 @@ public class API_TYPE_IDS
     public static final int FOUL_THROW_IN = 57;
     public static final int PENALTY_FACED = 58;
     public static final int KEEPER_SWEEPER = 59;
-    public static final int CHANGE_MISSED = 60;
+    public static final int CHANCE_MISSED = 60;
     public static final int BALL_TOUCH = 61;
     public static final int TEMP_SAVE = 63;
     public static final int RESUME = 64;

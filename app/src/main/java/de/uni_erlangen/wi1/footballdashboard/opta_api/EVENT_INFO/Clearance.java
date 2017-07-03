@@ -21,4 +21,10 @@ public class Clearance extends OPTA_Event
         return API_TYPE_IDS.CLEARANCE;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return "Successful clear by " + gov.getPlayerName(playerId) + (outcome ? " ,but possession switches to opponent" : "");
+    }
+
 }

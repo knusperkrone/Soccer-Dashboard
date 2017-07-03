@@ -21,4 +21,9 @@ public class Offside_Pass extends OPTA_Event
         return API_TYPE_IDS.OFFSIDE_PASS;
     }
 
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " is offside";
+    }
 }

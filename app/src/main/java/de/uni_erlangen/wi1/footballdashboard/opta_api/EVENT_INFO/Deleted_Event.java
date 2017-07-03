@@ -20,4 +20,12 @@ public class Deleted_Event extends OPTA_Event
     {
         return API_TYPE_IDS.DELETED_EVENT;
     }
+
+    @Override
+    public String getDescription()
+    {
+
+        return "Event has been deleted";
+    }
+
 }

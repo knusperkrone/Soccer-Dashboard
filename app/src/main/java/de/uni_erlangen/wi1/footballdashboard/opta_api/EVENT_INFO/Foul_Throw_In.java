@@ -21,4 +21,11 @@ public class Foul_Throw_In extends OPTA_Event
         return API_TYPE_IDS.FOUL_THROW_IN;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return "Incorrect throw-in by " + gov.getPlayerName(playerId);
+    }
+
 }

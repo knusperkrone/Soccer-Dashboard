@@ -21,4 +21,11 @@ public class Punch extends OPTA_Event
         return API_TYPE_IDS.PUNCH;
     }
 
+    //outcome is always set to 1
+    @Override
+    public String getDescription()
+    {
+        return gov.getPlayerName(playerId) + " punched the ball clear";
+    }
+
 }

@@ -7,6 +7,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
  * Created by knukro on 5/22/17.
  */
 
+//no longer used
 public class Good_Skill extends OPTA_Event
 {
 
@@ -20,5 +21,6 @@ public class Good_Skill extends OPTA_Event
     {
         return API_TYPE_IDS.GOOD_SKILL;
     }
+
 
 }
