@@ -154,6 +154,16 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
 
     public abstract int getID();
 
+    public int getPlayerId()
+    {
+        return playerId;
+    }
+
+    public boolean isSuccess()
+    {
+        return outcome;
+    }
+
     public String getDescription()
     {
         return "ID=" + getID();

@@ -23,6 +23,6 @@ public class Pass extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return (((outcome) ? "Unsuccessful" : "Successful") + " Pass by " + gov.getPlayerName(playerId));
+        return (((outcome) ? "Successful" : "Unsuccessful") + " Pass by " + gov.getPlayerName(playerId));
     }
 }
