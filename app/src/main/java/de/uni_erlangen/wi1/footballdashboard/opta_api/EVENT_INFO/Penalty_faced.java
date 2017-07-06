@@ -26,7 +26,7 @@ public class Penalty_faced extends OPTA_Event
     public String getDescription()
     {
         //Todo: Unsicher was man hiermit machen soll
-        return gov.getPlayerName(playerId) + "Opposing team was awarded a penalty";
+        return gov.getPlayerName(playerId, teamId) + "Opposing team was awarded a penalty";
     }
 
 }

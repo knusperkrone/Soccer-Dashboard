@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.player;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player;
 
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -83,7 +83,7 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
 
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
-        leftAxis.setAxisMaximum(11f);
+        leftAxis.setAxisMaximum(11.1f);
         leftAxis.setAxisMinimum(0f);
         //leftAxis.setYOffset(20f);
         leftAxis.enableGridDashedLine(10f, 10f, 0f);
@@ -101,14 +101,16 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
 
     private void setData()
     {
-
         ArrayList<Entry> values = new ArrayList<>();
 
-        int currTime = StatusBar.getInstance().getMaxRange() / 10;
-
+        // Add all values until currTime
+        int maxTime = StatusBar.getInstance().getMaxRange();
         int i = 0;
         for (Short rank : player.playerRankings) {
-            values.add(new Entry(i++, 11 - rank));
+            values.add(new Entry(i, 11 - rank));
+            if (i * 10 >= maxTime)
+                break;
+            i++;
         }
 
 
@@ -116,10 +118,12 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
 
         if (mChart.getData() != null &&
                 mChart.getData().getDataSetCount() > 0) {
+
             set1 = (LineDataSet) mChart.getData().getDataSetByIndex(0);
             set1.setValues(values);
             mChart.getData().notifyDataChanged();
             mChart.notifyDataSetChanged();
+
         } else {
             // create a dataset and give it a type
             set1 = new LineDataSet(values, "Team-Ranking");
@@ -141,8 +145,7 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
             set1.setFormSize(15.f);
             set1.setFillColor(Color.BLACK);
 
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the datasets
 
             // create a data object with the datasets
@@ -151,6 +154,15 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
             // set data
             mChart.setData(data);
         }
+    }
+
+    @Override
+    public void drawStatistics()
+    {
+        mChart.clearValues();
+        setData();
+        mChart.getData().notifyDataChanged();
+        mChart.notifyDataSetChanged();
     }
 
     @Override

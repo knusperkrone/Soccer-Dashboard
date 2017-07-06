@@ -16,8 +16,8 @@ import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event.LiveEventListAdapter;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event.LiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.ILiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
 
 /**
  * Created by knukro on 6/17/17.
@@ -27,16 +27,17 @@ public class LiveEventListFragment extends Fragment
 {
 
     private int teamId;
-    private LiveEventListAdapter listAdapter;
+    private LiveTeamListAdapter listAdapter;
+
 
     public static LiveEventListFragment newInstance(int teamId)
     {
-        LiveEventListFragment fragment = new LiveEventListFragment();
-        fragment.teamId = teamId;
-        return fragment;
+        LiveEventListFragment frag = new LiveEventListFragment();
+        frag.teamId = teamId;
+        return frag;
     }
 
-    public LiveEventListAdapter getLiveAdapter()
+    public LiveTeamListAdapter getLiveAdapter()
     {
         return listAdapter;
     }
@@ -46,25 +47,30 @@ public class LiveEventListFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
     {
         final View root = inflater.inflate(R.layout.part_detaillist, container, false);
+
         // Init expandableList
         RecyclerView expList = (RecyclerView) root.findViewById(R.id.main_list);
         expList.setHasFixedSize(true);
         expList.setItemViewCacheSize(50);
         expList.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Init adapter
-        List<OPTA_Event> passedEvents = DatabaseAdapter.getInstance()
-                .fillLiveList(StatusBar.getInstance().currTime, teamId);
-        listAdapter = new LiveEventListAdapter(passedEvents, getContext(), expList, new LiveFilter()
-        {
-            @Override
-            public boolean isValid(OPTA_Event event)
-            {
-                return event.teamId == teamId;
-            }
-        });
-        expList.setAdapter(listAdapter);
 
-        StatusBar.getInstance().setLiveEventListAdapter(listAdapter);
+        // Get data Range
+        StatusBar statusBar = StatusBar.getInstance();
+        List<OPTA_Event> passedEvents = DatabaseAdapter.getInstance()
+                .getLiveListData(teamId, statusBar.getMinRange(), statusBar.getMaxRange());
+        // init listAdapter
+        listAdapter = new LiveTeamListAdapter(passedEvents, getContext(), teamId, expList,
+                new ILiveFilter()
+                {
+                    @Override
+                    public boolean isValid(OPTA_Event event)
+                    {
+                        return event.teamId == teamId;
+                    }
+                });
+        // Set and register adapter
+        expList.setAdapter(listAdapter);
+        StatusBar.getInstance().setLiveTeamListAdapter(listAdapter);
 
         return root;
     }

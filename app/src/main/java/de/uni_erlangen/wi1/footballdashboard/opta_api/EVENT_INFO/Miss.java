@@ -25,6 +25,6 @@ public class Miss extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " shot over the goal";
+        return gov.getPlayerName(playerId, teamId) + " shot over the goal";
     }
 }

@@ -7,19 +7,23 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
  * Created by Jan on 02.07.2017.
  */
 
-public class Hand extends OPTA_Qualifier {
+public class Hand extends OPTA_Qualifier
+{
 
-    public Hand(String value) {
+    public Hand(String value)
+    {
         super(value);
     }
 
     @Override
-    public int getId() {
+    public int getId()
+    {
         return API_QUALIFIER_IDS.HAND;
     }
 
     @Override
-    public String describeContent() {
+    public String describeContent()
+    {
         return null;
     }
 }

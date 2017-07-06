@@ -25,7 +25,7 @@ public class Goalkeeper_Becomes_Player extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " became an outfield player";
+        return gov.getPlayerName(playerId, teamId) + " became an outfield player";
     }
 
 }

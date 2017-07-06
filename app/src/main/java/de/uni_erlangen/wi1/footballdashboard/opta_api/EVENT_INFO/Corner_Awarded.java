@@ -24,6 +24,6 @@ public class Corner_Awarded extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + (outcome ? "  conceded a corner" : " won a corner");
+        return gov.getPlayerName(playerId, teamId) + (outcome ? "  conceded a corner" : " won a corner");
     }
 }

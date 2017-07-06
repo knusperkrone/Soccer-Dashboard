@@ -2,64 +2,51 @@ package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fr
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Map;
+import android.widget.FrameLayout;
 
 import ca.hss.heatmaplib.HeatMap;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.HeatMapHelper;
-import de.uni_erlangen.wi1.footballdashboard.PlayerTeam;
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
+import de.uni_erlangen.wi1.footballdashboard.helper.HeatMapHelper;
+import de.uni_erlangen.wi1.footballdashboard.helper.ReferenceHolder;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
 
 
 public class FormationFragment extends Fragment
 {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private int layoutId;
-    private boolean homeTeam;
     private final PlayerView[] playerViews;
-    private PlayerTeam team;
+    private OPTA_Team team;
+    private int layoutId;
 
+    private final ReferenceHolder<FormationClickListener> clickedListener = new ReferenceHolder<>();
 
     public FormationFragment()
     {
         playerViews = new PlayerView[11];
     }
 
-    public static Fragment newInstance(int layoutId, boolean homeTeam)
+    public static FormationFragment newInstance(int layoutId, boolean homeTeam)
     {
-        Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, layoutId);
-        args.putBoolean(ARG_PARAM2, homeTeam);
+        FormationFragment frag = new FormationFragment();
+        // Set necessary data
+        GameGovernor gov = GameGovernor.getInstance();
+        frag.team = (homeTeam) ? gov.getHomeTeam() : gov.getAwayTeam();
+        frag.layoutId = layoutId;
 
-        FormationFragment tmp = new FormationFragment();
-        tmp.setArguments(args);
-
-        return tmp;
+        return frag;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void clearViewOverlays()
     {
-        super.onCreate(savedInstanceState);
-
-        Bundle args = getArguments();
-        if (args != null) {
-            layoutId = args.getInt(ARG_PARAM1, R.layout.formation2_left_to_right);
-            homeTeam = args.getBoolean(ARG_PARAM2, false);
-            if (homeTeam)
-                team = GameGovernor.getInstance().getHomeTeam();
-            else
-                team = GameGovernor.getInstance().getAwayTeam();
-        }
+        if (clickedListener.val != null)
+            clickedListener.val.reset();
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,42 +67,27 @@ public class FormationFragment extends Fragment
         playerViews[9] = (PlayerView) root.findViewById(R.id.p10);
         playerViews[10] = (PlayerView) root.findViewById(R.id.p11);
 
-        // Setup heatMap
-        final HeatMap heatMap = (HeatMap) root.findViewById(R.id.heatmap);
-        heatMap.setMinimum(10.0);
-        heatMap.setMaximum(100.0);
-        Map<Float, Integer> colors = new ArrayMap<>();
-        colors.put(0.0f, 0xffeef442);
-        colors.put(1.0f, 0xff0000);
-        heatMap.setColorStops(colors);
-
-        // Setup teamHolder
+        // Map views to team
         team.setViews(playerViews);
 
+        // Setup heatMap
+        HeatMap heatMap = (HeatMap) root.findViewById(R.id.heatmap);
+        HeatMapHelper.setupHeatMap(heatMap);
+
+
+        // References to shared values in the team, necessary to a consistent view state
+        ReferenceHolder<View> viewHolder = new ReferenceHolder<>();
+        ReferenceHolder<Integer> clickStateHolder = new ReferenceHolder<>(1);
+        // Setup onClick listener
+        FrameLayout overLayout = (FrameLayout) root.findViewById(R.id.frame);
+
         for (final PlayerView pView : playerViews) {
-            pView.playerImage.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    // Draw heatMap on UI-Thread
-                    getActivity().runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            heatMap.clearData();
-                            if (team.prepHeatMap(pView)) {
-                                HeatMapHelper.addDataPointsToHeatmap(pView.getMappedPlayer(), heatMap, homeTeam);
-                            }
-                            heatMap.forceRefresh();
-                        }
-                    });
-                }
-            });
+            // Set all the same references for each player in the team
+            pView.playerImage.setOnClickListener(
+                    new FormationClickListener(team, pView, playerViews, getActivity(), heatMap,
+                            overLayout, viewHolder, clickStateHolder, clickedListener));
         }
 
         return root;
     }
-
 }

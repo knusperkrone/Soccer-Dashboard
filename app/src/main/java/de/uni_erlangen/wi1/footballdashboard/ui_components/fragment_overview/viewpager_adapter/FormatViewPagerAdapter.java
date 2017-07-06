@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.formation_viewpager_adapter;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.viewpager_adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -7,6 +7,7 @@ import android.util.Log;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fragments.FormationFragment;
 
 /**
@@ -18,6 +19,9 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
 {
 
     private final int layoutHome, layoutAway;
+    private FormationFragment homeFragment;
+    private FormationFragment awayFragment;
+
 
     public FormatViewPagerAdapter(FragmentManager fm)
     {
@@ -32,19 +36,26 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
     {
         switch (position) {
             case 0:
-                return FormationFragment.newInstance(layoutHome, true);
+                homeFragment = FormationFragment.newInstance(layoutHome, true);
+                return homeFragment;
             case 1:
-                return FormationFragment.newInstance(layoutAway, false);
+                awayFragment = FormationFragment.newInstance(layoutAway, false);
+                return awayFragment;
         }
         throw new IllegalArgumentException("You can't have more than 2 team playing");
     }
+
+    public FormationFragment getInactiveFragment()
+    {
+        return StatusBar.getInstance().isShowingHome() ? awayFragment : homeFragment;
+    }
+
 
     @Override
     public int getCount()
     {
         return 2;
     }
-
 
     private static int getHomeLayoutId(int optaID)
     {

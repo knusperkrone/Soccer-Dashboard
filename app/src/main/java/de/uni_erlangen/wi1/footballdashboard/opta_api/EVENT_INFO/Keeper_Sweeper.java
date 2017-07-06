@@ -24,7 +24,7 @@ public class Keeper_Sweeper extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + "cleared the ball" + (outcome ? ", but possession changed" : "");
+        return gov.getPlayerName(playerId, teamId) + "cleared the ball" + (outcome ? ", but possession changed" : "");
     }
 
 }

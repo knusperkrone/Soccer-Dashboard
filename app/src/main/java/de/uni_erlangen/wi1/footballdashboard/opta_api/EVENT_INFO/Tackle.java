@@ -22,8 +22,8 @@ public class Tackle extends OPTA_Event
     }
 
     @Override
-public String getDescription()
-{
-    return outcome ? "Unsuccessful tackle by " + gov.getPlayerName(playerId) : "Unsuccessful tackle by " + gov.getPlayerName(playerId);
-}
+    public String getDescription()
+    {
+        return (outcome ? "Unsuccessful" : "Successful") + "tackle by " + gov.getPlayerName(playerId, teamId);
+    }
 }

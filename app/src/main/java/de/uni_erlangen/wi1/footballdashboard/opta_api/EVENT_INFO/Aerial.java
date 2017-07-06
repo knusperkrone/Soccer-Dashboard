@@ -29,6 +29,6 @@ public class Aerial extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + (outcome ? " lost an aerial duel" : " won an aerial duel");
+        return gov.getPlayerName(playerId, teamId) + (outcome ? " lost an aerial duel" : " won an aerial duel");
     }
 }

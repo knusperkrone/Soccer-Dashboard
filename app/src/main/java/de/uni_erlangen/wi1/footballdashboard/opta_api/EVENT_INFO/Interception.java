@@ -26,6 +26,6 @@ public class Interception extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " intercepted a pass";
+        return gov.getPlayerName(playerId, teamId) + " intercepted a pass";
     }
 }

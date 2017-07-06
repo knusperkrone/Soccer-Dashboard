@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard;
+package de.uni_erlangen.wi1.footballdashboard.helper;
 
 /**
  * Created by knukro on 6/28/17.
@@ -16,7 +16,7 @@ public class ReferenceHolder<T>
 
     public ReferenceHolder()
     {
-        // Empty
+        // Emptywith for each player.ID
     }
 
 }

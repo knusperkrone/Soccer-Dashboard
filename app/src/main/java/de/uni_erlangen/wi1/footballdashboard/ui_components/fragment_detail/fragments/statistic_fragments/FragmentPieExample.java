@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.graph_adapter;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -25,10 +25,10 @@ import com.github.mikephil.charting.utils.MPPointF;
 import java.util.ArrayList;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.player.IPlayerFragment;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.team.ITeamFragment;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.IPlayerFragment;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team.ITeamFragment;
 
 public class FragmentPieExample extends Fragment implements ITeamFragment, IPlayerFragment
 {
@@ -40,7 +40,13 @@ public class FragmentPieExample extends Fragment implements ITeamFragment, IPlay
     }
 
     @Override
-    public void changeTeam(OPTA_Team team)
+    public void drawStatistics()
+    {
+
+    }
+
+    @Override
+    public void setNewTeam(OPTA_Team team)
     {
 
     }

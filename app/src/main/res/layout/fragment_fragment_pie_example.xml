@@ -2,7 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context=".ui_components.fragment_detail.graph_adapter.FragmentPieExample">
+             tools:context=".ui_components.fragment_detail.fragments.statistic_fragments.FragmentPieExample">
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/chart1"

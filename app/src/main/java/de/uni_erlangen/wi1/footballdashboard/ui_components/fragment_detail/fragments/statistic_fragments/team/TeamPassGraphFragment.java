@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.team;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team;
 
 
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 
 /**
  * Created by knukro on 6/27/17.
+ * TestFragment
  */
 
 public class TeamPassGraphFragment extends Fragment implements ITeamFragment
@@ -32,15 +33,6 @@ public class TeamPassGraphFragment extends Fragment implements ITeamFragment
         return frag;
     }
 
-    @Override
-    public void changeTeam(OPTA_Team team)
-    {
-        this.team = team;
-        int[] passes = countTeamPasses();
-        countView.setText("" + passes[0] + "/" + passes[1]);
-    }
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
@@ -48,9 +40,22 @@ public class TeamPassGraphFragment extends Fragment implements ITeamFragment
         View root = inflater.inflate(R.layout.stat_teaminfo_passgraph, container, false);
 
         countView = (TextView) root.findViewById(R.id.team_paesse);
-        int[] passes = countTeamPasses();
-        countView.setText("Overall: " + passes[0] + "\nSuccess: " + passes[1]);
+
+        drawStatistics();
         return root;
+    }
+
+    @Override
+    public void setNewTeam(OPTA_Team team)
+    {
+        this.team = team;
+    }
+
+    @Override
+    public void drawStatistics()
+    {
+        int[] passes = countTeamPasses();
+        countView.setText("" + passes[0] + "/" + passes[1]);
     }
 
 

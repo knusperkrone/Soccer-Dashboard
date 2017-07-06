@@ -25,7 +25,7 @@ public class Smother extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " won possession of the ball";
+        return gov.getPlayerName(playerId, teamId) + " won possession of the ball";
     }
 
 }

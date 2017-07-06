@@ -24,12 +24,13 @@ public class Take_On extends OPTA_Event
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         for (OPTA_Qualifier q : qualifiers) {
             if (q instanceof Overrun) {
-                return "Successful take on by " + gov.getPlayerName(playerId) + " ,but player lost the ball";
+                return "Successful take on by " + gov.getPlayerName(playerId, teamId) + " ,but player lost the ball";
             }
         }
-        return (((outcome) ? "Unsuccessful" : "Successful") + " Take on by " + gov.getPlayerName(playerId));
+        return (outcome ? "Successful" : "Unsuccessful") + " Take on by " + gov.getPlayerName(playerId, teamId);
     }
 }

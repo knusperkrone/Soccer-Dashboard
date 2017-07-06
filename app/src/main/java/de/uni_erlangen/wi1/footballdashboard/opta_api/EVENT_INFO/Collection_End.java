@@ -22,10 +22,10 @@ public class Collection_End extends OPTA_Event
     }
 
     //outcome is always set to 1
-   /* @Override
+    @Override
     public String getDescription()
     {
-        Todo
+        return "COLLECTION_END EVENT";
     }
-    */
+
 }

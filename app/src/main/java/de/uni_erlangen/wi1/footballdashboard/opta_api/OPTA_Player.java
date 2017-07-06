@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
@@ -13,12 +12,12 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.cus
 public class OPTA_Player implements Comparable
 {
 
-    private enum Position
+    enum Position
     {
         GOALKEEPER, DEFENDER, MIDFIELDER, STRIKER, SUBSTITUTE
     }
 
-    // OPTA Data
+    // OPTA values
     private final int id;
     private String name;
     private int shirtNumber;
@@ -28,28 +27,26 @@ public class OPTA_Player implements Comparable
     // Own values
     private boolean captain = false;
     private int rankingPoints = 60;
-    private short card = 0;
+    private short cardIndicator = 0;
 
     public final List<OPTA_Event> actions = new ArrayList<>();
+    public final List<Short> playerRankings = new ArrayList<>(90);
 
-    public final List<Integer> teamRankings = new LinkedList<>();
-    public PlayerView mappedView;
+    PlayerView mappedView;
+
 
     public OPTA_Player(int id)
     {
         this.id = id;
     }
 
-    public void setCaptain(boolean isCaptain)
-    {
-        this.captain = isCaptain;
-    }
-
     public void setName(String firstName, @Nullable String knownName, String lastName)
     {
+        // Shows KnowName, if it's there
         if (knownName != null && !knownName.equals("null")) {
             this.name = knownName;
         } else {
+            // Or fullName, if Name if short enough
             if (lastName.length() < 8)
                 this.name = firstName.charAt(0) + ". " + lastName;
             else
@@ -57,24 +54,8 @@ public class OPTA_Player implements Comparable
         }
     }
 
-    public void mapView(PlayerView view)
-    {
-        this.mappedView = view;
-    }
-
-    public void setShirtNumber(String shirtNumber)
-    {
-        this.shirtNumber = Integer.valueOf(shirtNumber);
-    }
-
-    public void setLayoutPosition(String layoutPos)
-    {
-        this.layoutPosition = Integer.valueOf(layoutPos);
-    }
-
     public void setPosition(String position)
     {
-        //TODO: Double check!
         switch (Integer.valueOf(position)) {
             case 1:
                 this.position = Position.GOALKEEPER;
@@ -94,6 +75,53 @@ public class OPTA_Player implements Comparable
         }
     }
 
+    public void changeRankingPoints(int value)
+    {
+        rankingPoints += value;
+        if (rankingPoints > 100) rankingPoints = 100;
+        else if (rankingPoints < 0) rankingPoints = 0;
+    }
+
+    void mapView(PlayerView view)
+    {
+        this.mappedView = view;
+    }
+
+    public void setShirtNumber(String shirtNumber)
+    {
+        this.shirtNumber = Integer.valueOf(shirtNumber);
+    }
+
+    public void setLayoutPosition(String layoutPos)
+    {
+        this.layoutPosition = Integer.valueOf(layoutPos);
+    }
+
+    public void setCaptain(boolean isCaptain)
+    {
+        this.captain = isCaptain;
+    }
+
+    public boolean hasYellowCard()
+    {
+        return cardIndicator == 1;
+    }
+
+    public boolean hasRedCard()
+    {
+        return cardIndicator == 2;
+    }
+
+    public boolean isActive()
+    {
+        return layoutPosition != 0;
+    }
+
+    public boolean isCaptain()
+    {
+        return captain;
+    }
+
     public int getId()
     {
         return id;
@@ -109,7 +137,7 @@ public class OPTA_Player implements Comparable
         return shirtNumber;
     }
 
-    public int getLayoutPosition()
+    int getLayoutPosition()
     {
         return layoutPosition;
     }
@@ -117,11 +145,6 @@ public class OPTA_Player implements Comparable
     public Position getPosition()
     {
         return position;
-    }
-
-    public boolean isCaptain()
-    {
-        return captain;
     }
 
     public int getRankingPoints()
@@ -134,24 +157,10 @@ public class OPTA_Player implements Comparable
         return actions;
     }
 
-    public boolean hasYellowCard()
-    {
-        return card == 1;
-    }
-
-    public boolean hasRedCard()
-    {
-        return card == 2;
-    }
-
-    public boolean isActive()
-    {
-        return layoutPosition != 0;
-    }
-
     @Override
     public int compareTo(@NonNull Object o)
     {
+        // Prefer active over inactive and ranking descending
         OPTA_Player t1 = (OPTA_Player) o;
         if (isActive() && !t1.isActive())
             return -1;
@@ -159,7 +168,12 @@ public class OPTA_Player implements Comparable
             return 1;
         else if (!isActive() && !t1.isActive())
             return 0;
-        return getRankingPoints() - t1.getRankingPoints();
+        return t1.getRankingPoints() - rankingPoints;
     }
 
+    @Override
+    public String toString()
+    {
+        return name + " (Points: " + rankingPoints + ", currRang:" + playerRankings.get(playerRankings.size() - 1) + ")";
+    }
 }

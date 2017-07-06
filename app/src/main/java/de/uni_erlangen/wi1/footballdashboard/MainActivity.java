@@ -60,12 +60,13 @@ public class MainActivity extends AppCompatActivity
         final VerticalViewPager mainViewPager = (VerticalViewPager) findViewById(R.id.main_viewpager);
         final MainViewpagerAdapter adapter = new MainViewpagerAdapter(fm);
         mainViewPager.setAdapter(adapter);
+
+        // Notify the new-found active fragment, over it's state!
         mainViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
         {
             @Override
             public void onPageSelected(final int position)
             {
-                // Test if ui-thread is a good idea.
                 runOnUiThread(new Runnable()
                 {
                     @Override
@@ -75,9 +76,9 @@ public class MainActivity extends AppCompatActivity
                         if (frag == null)
                             return;
                         if (position == 0)
-                            ((OverviewFragment) frag).prepare();
+                            ((OverviewFragment) frag).setActive();
                         else
-                            ((DetailFragment) frag).prepare();
+                            ((DetailFragment) frag).setActive();
                     }
                 });
             }
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity
         else
             timer.cancel();
 
-        StatusBar.initInstance(new Handler(), governor.getHalfTimeLength(),
+        StatusBar.initInstance(new Handler(), governor.getLatestEventTime(),
                 (TextView) findViewById(R.id.statusbar_time),
                 (TextView) findViewById(R.id.statusbar_goal),
                 (TextView) findViewById(R.id.statusbar_team));

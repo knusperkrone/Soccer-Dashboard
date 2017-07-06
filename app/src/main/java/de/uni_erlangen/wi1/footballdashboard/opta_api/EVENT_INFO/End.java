@@ -25,7 +25,7 @@ public class End extends OPTA_Event
     @Override
     public String getDescription()
     {
-        switch(period_id){
+        switch (period_id) {
             case 1:
                 return "First half ended";
             case 2:

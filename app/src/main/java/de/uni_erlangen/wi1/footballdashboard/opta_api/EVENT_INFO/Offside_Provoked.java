@@ -25,7 +25,7 @@ public class Offside_Provoked extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " provoked offside";
+        return gov.getPlayerName(playerId, teamId) + " provoked offside";
     }
 
 }

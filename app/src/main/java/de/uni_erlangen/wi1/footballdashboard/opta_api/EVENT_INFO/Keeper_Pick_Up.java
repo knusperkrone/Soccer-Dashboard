@@ -25,7 +25,7 @@ public class Keeper_Pick_Up extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " picked up the ball";
+        return gov.getPlayerName(playerId, teamId) + " picked up the ball";
     }
 
 }

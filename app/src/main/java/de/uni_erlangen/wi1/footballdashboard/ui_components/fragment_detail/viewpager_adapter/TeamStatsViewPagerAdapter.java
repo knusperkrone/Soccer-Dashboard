@@ -1,9 +1,8 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistics_viewpager_adapter;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
@@ -30,9 +29,14 @@ public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
 
     public void changeTeam(OPTA_Team team)
     {
-        Log.d("[TEAM_STAT_ADAPTER]", "changedTeam() called");
         this.team = team;
-        currFragment.changeTeam(team);
+        currFragment.setNewTeam(team);
+        currFragment.drawStatistics();
+    }
+
+    public void refreshActiveItem()
+    {
+        currFragment.drawStatistics();
     }
 
     @Override

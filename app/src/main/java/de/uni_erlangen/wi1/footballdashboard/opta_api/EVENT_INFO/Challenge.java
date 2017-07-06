@@ -25,7 +25,7 @@ public class Challenge extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Unsuccessful challenge by " + gov.getPlayerName(playerId);
+        return "Unsuccessful challenge by " + gov.getPlayerName(playerId, teamId);
     }
 
 }

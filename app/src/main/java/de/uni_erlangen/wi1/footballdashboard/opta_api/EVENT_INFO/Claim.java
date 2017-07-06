@@ -24,7 +24,7 @@ public class Claim extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return outcome ? gov.getPlayerName(playerId) + " dropped the ball after a catch" : gov.getPlayerName(playerId) + " caught the ball";
+        return gov.getPlayerName(playerId, teamId) + (outcome ? " dropped the ball after a catch" : " caught the ball");
     }
 
 }

@@ -20,12 +20,21 @@
             android:layout_weight="1"
             android:background="@drawable/playfield"/>
 
-        <ProgressBar
-            android:id="@+id/main_time"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_weight="0"
-            android:background="#00F"/>
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher"/>
+
+            <org.florescu.android.rangeseekbar.RangeSeekBar
+                android:id="@+id/rangeBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
 
     </TableLayout>
 

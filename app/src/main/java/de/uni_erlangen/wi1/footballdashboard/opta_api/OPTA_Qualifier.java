@@ -1,6 +1,7 @@
 package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
-import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Cross;
+import android.util.Log;
+
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Hand;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Attempt;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Goal;
@@ -18,48 +19,47 @@ public abstract class OPTA_Qualifier
 {
 
     protected final String value;
-    private boolean evaluated;
-    private double cost;
 
     public OPTA_Qualifier(String value)
     {
         this.value = value;
-        evaluated = false;
     }
 
     public static OPTA_Qualifier newInstance(int id, String value)
     {
-        OPTA_Qualifier qualifier = new Cross(value);
+        OPTA_Qualifier qualifier = null;
         switch (id) {
             case API_QUALIFIER_IDS.OVERRUN:
                 qualifier = new Overrun(value);
+                break;
             case API_QUALIFIER_IDS.HAND:
                 qualifier = new Hand(value);
+                break;
             case API_QUALIFIER_IDS.LEADING_TO_ATTEMPT:
                 qualifier = new Leading_To_Attempt(value);
+                break;
             case API_QUALIFIER_IDS.LEADING_TO_GOAL:
                 qualifier = new Leading_To_Goal(value);
+                break;
             case API_QUALIFIER_IDS.PENALTY:
                 qualifier = new Penalty(value);
+                break;
             case API_QUALIFIER_IDS.RED_CARD:
                 qualifier = new Red_Card(value);
+                break;
             case API_QUALIFIER_IDS.SECOND_YELLOW:
                 qualifier = new Second_Yellow(value);
+                break;
             case API_QUALIFIER_IDS.YELLOW_CARD:
                 qualifier = new Yellow_Card(value);
+                break;
             default:
         }
-        return qualifier;
-    }
-
-
-    public double GetCost()
-    {
-        if (!evaluated) {
-            //evaluateCost(); // Template Method
-            evaluated = true;
+        if (qualifier == null) {
+            Log.d("OPTA_QUALIFIER", "No newInstance() case for: " + id);
+            qualifier = new Overrun(value);
         }
-        return this.cost;
+        return qualifier;
     }
 
     public String getValue()
@@ -70,11 +70,5 @@ public abstract class OPTA_Qualifier
     public abstract int getId();
 
     public abstract String describeContent();
-
-   /* public String descripeContent()
-    {
-        return "Qualifier";
-    }
-    */
 
 }

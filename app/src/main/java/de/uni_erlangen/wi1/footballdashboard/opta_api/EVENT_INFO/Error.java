@@ -28,15 +28,15 @@ public class Error extends OPTA_Event
     @Override
     public String getDescription()
     {
-        for(OPTA_Qualifier q : qualifiers){
-            if (q instanceof Leading_To_Attempt){
-                return gov.getPlayerName(playerId) + " lost the ball which led to an attempt";
+        for (OPTA_Qualifier q : qualifiers) {
+            if (q instanceof Leading_To_Attempt) {
+                return gov.getPlayerName(playerId, teamId) + " lost the ball which led to an attempt";
             }
-            if(q instanceof Leading_To_Goal){
-                return gov.getPlayerName(playerId) + " lost the ball which led to a goal";
+            if (q instanceof Leading_To_Goal) {
+                return gov.getPlayerName(playerId, teamId) + " lost the ball which led to a goal";
             }
         }
-        return gov.getPlayerName(playerId) + " lost the ball";
+        return gov.getPlayerName(playerId, teamId) + " lost the ball";
     }
 
 }

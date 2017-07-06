@@ -26,7 +26,7 @@ public class Rescinded_Card extends OPTA_Event
     public String getDescription()
     {
         //Todo Unterscheidung Gelb/Rot
-        return gov.getPlayerName(playerId) + "; Referee rescinded a card";
+        return gov.getPlayerName(playerId, teamId) + " Referee rescinded a card";
     }
 }
 

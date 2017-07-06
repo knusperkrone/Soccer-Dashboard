@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_QUALIFIER_IDS;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Pass;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
@@ -27,9 +28,8 @@ class DbGameHelper extends SQLiteOpenHelper
     private final String DB_PATH;
     private SQLiteDatabase mDatabase;
 
-    private final List<TimeList> cachedEventsHomePeriods = new ArrayList<>(4);
-    private final List<TimeList> cachedEventsAwayPeriods = new ArrayList<>(4);
-
+    private TimeList cachedHomeEvents;
+    private TimeList cachedAwayEvents;
 
     DbGameHelper(Context context, String name)
     {
@@ -45,6 +45,7 @@ class DbGameHelper extends SQLiteOpenHelper
             else
                 Toast.makeText(context, "[GAME] Database initing failed!", Toast.LENGTH_SHORT).show();
         }
+
         // Cache all data!
         cacheData();
     }
@@ -64,72 +65,103 @@ class DbGameHelper extends SQLiteOpenHelper
     private void cacheData()
     {
         openDatabase();
-        int period = 1;
-        do {
-            List<OPTA_Event>[] periodData = getPeriod(period);
-            if (periodData == null)
-                break;
 
-            cachedEventsHomePeriods.add(new TimeList(periodData[0]));
-            cachedEventsAwayPeriods.add(new TimeList(periodData[1]));
-            period++;
-        } while (period < 5); // Cache data until penalty shootout
+        // make a query and save return tuple
+        List<OPTA_Event>[] periodData = cacheQuery();
+        cachedHomeEvents = new TimeList(periodData[0]);
+        cachedAwayEvents = new TimeList(periodData[1]);
+
         closeDatabase();
     }
 
-    private List<OPTA_Event>[] getPeriod(int period)
+    private List<OPTA_Event>[] cacheQuery()
     {
-        final String query = "SELECT id_event, typ_Id , outcome, min, sec,id_player,id_team, x_coord, y_cood, value, qualifier_id " +
+        final String query = "SELECT id_event, typ_Id, outcome, min, sec, id_player, id_team, x_coord, y_cood, value, qualifier_id, period " +
                 " FROM EventData " +
                 " JOIN Qualifier " +
                 " ON EventData.ID_Qualifier == Qualifier.ID " +
-                " WHERE period == ? " +
+                " WHERE period < 6 AND period > 0 " +
                 " ORDER BY min, sec";
 
-        Cursor cursor = mDatabase.rawQuery(query, new String[]{"" + period});
+        Cursor cursor = mDatabase.rawQuery(query, new String[]{ });
         cursor.moveToFirst();
         if (cursor.getCount() == 0) {
             cursor.close(); // Nothing to do here
             return null;
         }
 
+        // Allocate 2 Lists, with approximately enough memory
         List<OPTA_Event> homeList = new ArrayList<>(cursor.getCount() / 2);
         List<OPTA_Event> awayList = new ArrayList<>(cursor.getCount() / 2);
 
-        GameGovernor governor = GameGovernor.getInstance();
+        // Values for easy filtering
+        int homeId = GameGovernor.getInstance().getHomeTeamId();
+        OPTA_Event oldHomeEvent = null;
+        OPTA_Event oldAwayEvent = null;
 
+        // Parse SQL-Cursor
         while (!cursor.isAfterLast()) {
-            // Parse SQL-Cursor
+
+            // Get attributes, to classify event
             int eventId = cursor.getInt(0);
             int teamId = cursor.getInt(6);
+
+            // Create Event
             OPTA_Event currEvent = OPTA_Event.newInstance(
-                    cursor.getInt(1),
-                    cursor.getInt(2) == 1,
-                    period,
-                    cursor.getInt(3),
-                    cursor.getInt(4),
-                    cursor.getInt(5),
-                    cursor.getInt(6),
-                    cursor.getDouble(7),
-                    cursor.getDouble(8));
+                    cursor.getInt(1), // typeID
+                    cursor.getInt(2) == 1, // Outcome
+                    cursor.getInt(11), // Period
+                    cursor.getInt(3), // Min
+                    cursor.getInt(4), // Sec
+                    cursor.getInt(5), // PlayerId
+                    teamId, // TeamId
+                    cursor.getDouble(7), // X-Coord
+                    cursor.getDouble(8)); // Y-Coord
+
+            // Parse all Qualifiers - there is at least 1
             do {
-                // Get all qualifiers
-                currEvent.qualifiers.add(OPTA_Qualifier.newInstance(cursor.getInt(10), cursor.getString(9)));
+                currEvent.qualifiers.add(OPTA_Qualifier.newInstance(
+                        cursor.getInt(10),
+                        cursor.getString(9)));
+
+                // Automatically moves to next event here, when condition fails
                 cursor.moveToNext();
             } while (!cursor.isAfterLast() && cursor.getInt(0) == eventId);
 
-            // Add to teamList
-            if (governor.isHomeTeamId(teamId))
-                homeList.add(currEvent);
-            else
-                awayList.add(currEvent);
+
+            if (homeId == teamId) { // HomeTeam
+
+                // Check if the oldEvent, equals the currEvent to filter duplicates
+                if (oldHomeEvent == null || currEvent instanceof Pass
+                        || (oldHomeEvent.getID() != currEvent.getID()
+                        && oldHomeEvent.getPlayerId() != currEvent.getPlayerId())) {
+
+                    // Add to list and set new oldEvent
+                    homeList.add(currEvent);
+                    oldHomeEvent = currEvent;
+                }
+            } else { // AwayTeam
+
+                // Check if the oldEvent, equals the currEvent to filter duplicates
+                if (oldAwayEvent == null || currEvent instanceof Pass
+                        || (oldAwayEvent.getID() != currEvent.getID()
+                        && oldAwayEvent.getPlayerId() != currEvent.getPlayerId())) {
+
+                    // Add to list and set new oldEvent
+                    awayList.add(currEvent);
+                    oldAwayEvent = currEvent;
+                }
+            }
         }
+
         cursor.close();
-        return new List[]{homeList, awayList}; // Return tuple
+        return new List[]{homeList, awayList}; // Return list tuple
     }
+
 
     void getPlayerData(GameGovernor.GameGovernorData data, boolean home)
     {
+        // Only Parse data for period 16 -> Pregame
         final String query = "SELECT qualifier_id, value, ID_team " +
                 " FROM EventData " +
                 " JOIN Qualifier " +
@@ -138,16 +170,19 @@ class DbGameHelper extends SQLiteOpenHelper
                 " AND Period == 16 " +
                 " ORDER BY Qualifier_ID";
 
-        // Choose the references form @data
+        // Choose the right team references form @data
         SparseArray<OPTA_Player> players = (home) ? data.homeTeam.getPlayers() : data.awayTeam.getPlayers();
         int teamId = (home) ? data.homeTeam.getId() : data.awayTeam.getId();
 
+        // Make the query
         openDatabase();
         Cursor cursor = mDatabase.rawQuery(query, new String[]{"" + teamId});
         cursor.moveToFirst();
-        // PlayerIDs are luckily the first row!
+
+        // PlayerIDs are in the first entry!
         String[] playerIds = cursor.getString(1).split(", ");
         for (String s : playerIds) {
+            // Parse the string and create new players for every parsed ID
             int id = Integer.valueOf(s);
             players.put(id, new OPTA_Player(id));
         }
@@ -155,28 +190,38 @@ class DbGameHelper extends SQLiteOpenHelper
         // Parse Pre-Game Query
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             switch (cursor.getInt(0)) {
-                case API_QUALIFIER_IDS.PLAYER_POSITION: // Goalkeeper, Defender, etc.
+
+                case API_QUALIFIER_IDS.PLAYER_POSITION:
+                    // Parse for Goalkeeper, Defender, Striker for every Player
                     String[] positions = cursor.getString(1).split(", ");
                     for (int i = 0; i < positions.length; i++)
                         players.get(Integer.valueOf(playerIds[i])).setPosition(positions[i]);
                     break;
+
                 case API_QUALIFIER_IDS.TEAM_FORMATION:
+                    // Get the team formation/layout value
                     if (home)
                         data.homeLayout = Integer.valueOf(cursor.getString(1));
                     else
                         data.awayLayout = Integer.valueOf(cursor.getString(1));
                     break;
-                case API_QUALIFIER_IDS.JERSEY_NUMBER: // ShirtNumber
+
+                case API_QUALIFIER_IDS.JERSEY_NUMBER:
+                    // Parse shirtNumber for every Player
                     String[] shirtNumbers = cursor.getString(1).split(", ");
                     for (int i = 0; i < shirtNumbers.length; i++)
                         players.get(Integer.valueOf(playerIds[i])).setShirtNumber(shirtNumbers[i]);
                     break;
-                case API_QUALIFIER_IDS.TEAM_PLAYER_FORMATION: // player position in formation
+
+                case API_QUALIFIER_IDS.TEAM_PLAYER_FORMATION:
+                    // Parse player position in formation for every Player
                     String[] layoutPos = cursor.getString(1).split(", ");
                     for (int i = 0; i < layoutPos.length; i++)
                         players.get(Integer.valueOf(playerIds[i])).setLayoutPosition(layoutPos[i]);
                     break;
+
                 case API_QUALIFIER_IDS.CAPTAIN:
+                    // Set Captain
                     players.get(Integer.valueOf(cursor.getString(1))).setCaptain(true);
                     break;
 
@@ -185,48 +230,50 @@ class DbGameHelper extends SQLiteOpenHelper
                 case API_QUALIFIER_IDS.RESUME:
             }
         }
+
         cursor.close();
         closeDatabase();
     }
 
-
-    void getPlayerEvents(SparseArray<OPTA_Player> players, boolean homeTeam)
+    List<OPTA_Event> getTeamEvents(boolean homeTeam)
     {
-        List<TimeList> events = (homeTeam) ? cachedEventsHomePeriods : cachedEventsAwayPeriods;
-        // Adds every event to a player - not as time consuming btw
-        for (TimeList list : events) {
-            for (OPTA_Event info : list.dataList) {
-                OPTA_Player OPTAPlayer = players.get(info.playerId);
-                if (OPTAPlayer != null)
-                    OPTAPlayer.actions.add(info);
-            }
+        // Return the list for the right team and period
+        return (homeTeam) ? cachedHomeEvents.dataList : cachedAwayEvents.dataList;
+    }
+
+    void mapPlayerEvents(SparseArray<OPTA_Player> players, boolean homeTeam)
+    {
+        // Maps every event to the right player
+        // Choose right list
+        TimeList list = (homeTeam) ? cachedHomeEvents : cachedAwayEvents;
+        for (OPTA_Event info : list.dataList) {
+            OPTA_Player OPTAPlayer = players.get(info.playerId);
+            if (OPTAPlayer != null)
+                OPTAPlayer.actions.add(info);
         }
     }
 
-
-    List<OPTA_Event> getNewHomeValues(int period, int time)
+    List<OPTA_Event> getNewHomeValues(int endTime)
     {
-        return cachedEventsHomePeriods.get(period).updateValues(time);
+        return cachedHomeEvents.updateValues(endTime);
     }
 
-    List<OPTA_Event> getNewAwayValues(int period, int time)
+    List<OPTA_Event> getNewAwayValues(int endTime)
     {
-        return cachedEventsAwayPeriods.get(period).updateValues(time);
+        return cachedAwayEvents.updateValues(endTime);
     }
 
-
-    List<OPTA_Event> getHomeValuesUntil(int period, int time)
+    List<OPTA_Event> getHomeValuesUntil(int startTime, int endTime)
     {
-        return cachedEventsHomePeriods.get(period).getValuesUntil(time);
+        return cachedHomeEvents.getValuesRange(startTime, endTime);
     }
 
-    List<OPTA_Event> getAwayValuesUntil(int period, int time)
+    List<OPTA_Event> getAwayValuesUntil(int startTime, int endTime)
     {
-        return cachedEventsAwayPeriods.get(period).getValuesUntil(time);
+        return cachedAwayEvents.getValuesRange(startTime, endTime);
     }
 
-
-    // Unecessary Stuff
+    // Unnecessary Stuff
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase)
     {

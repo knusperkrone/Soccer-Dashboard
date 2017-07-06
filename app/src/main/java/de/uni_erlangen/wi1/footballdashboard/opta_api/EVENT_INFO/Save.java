@@ -25,7 +25,7 @@ public class Save extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Save by " + gov.getPlayerName(playerId);
+        return "Save by " + gov.getPlayerName(playerId, teamId);
     }
 
 }

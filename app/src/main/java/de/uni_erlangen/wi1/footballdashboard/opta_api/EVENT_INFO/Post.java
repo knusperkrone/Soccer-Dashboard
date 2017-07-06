@@ -25,6 +25,6 @@ public class Post extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " hit the frame of the goal";
+        return gov.getPlayerName(playerId, teamId) + " hit the frame of the goal";
     }
 }

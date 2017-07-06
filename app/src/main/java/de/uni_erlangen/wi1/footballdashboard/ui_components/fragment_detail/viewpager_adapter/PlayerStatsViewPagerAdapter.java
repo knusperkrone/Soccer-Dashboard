@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistics_viewpager_adapter;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,11 +33,12 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
     {
         this.player = player;
         currFragment.setNewPlayer(player);
-        // Redraw Fragment
-        fm.beginTransaction()
-                .detach((Fragment) currFragment)
-                .attach((Fragment) currFragment)
-                .commit();
+        currFragment.drawStatistics();
+    }
+
+    public void refreshActiveItem()
+    {
+        currFragment.drawStatistics();
     }
 
     @Override

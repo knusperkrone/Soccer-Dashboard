@@ -25,6 +25,6 @@ public class Goal extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Goal by " + gov.getPlayerName(playerId);
+        return "Goal by " + gov.getPlayerName(playerId, teamId);
     }
 }

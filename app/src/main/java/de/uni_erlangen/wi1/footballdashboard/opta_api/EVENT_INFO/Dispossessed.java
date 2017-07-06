@@ -25,7 +25,7 @@ public class Dispossessed extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " was tackled and lost the ball";
+        return gov.getPlayerName(playerId, teamId) + " was tackled and lost the ball";
     }
 
 }

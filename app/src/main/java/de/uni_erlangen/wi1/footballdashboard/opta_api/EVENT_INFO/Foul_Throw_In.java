@@ -25,7 +25,7 @@ public class Foul_Throw_In extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Incorrect throw-in by " + gov.getPlayerName(playerId);
+        return "Incorrect throw-in by " + gov.getPlayerName(playerId, teamId);
     }
 
 }

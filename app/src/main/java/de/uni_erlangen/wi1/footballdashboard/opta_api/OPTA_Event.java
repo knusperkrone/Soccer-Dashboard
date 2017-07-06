@@ -114,7 +114,7 @@ import static de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS.TURNOV
 public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
 {
 
-    protected final GameGovernor gov = GameGovernor.getInstance();
+    protected static final GameGovernor gov = GameGovernor.getInstance();
 
     public final List<OPTA_Qualifier> qualifiers = new ArrayList<>(11);
 
@@ -150,6 +150,11 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
     public boolean isInitiallyExpanded()
     {
         return false;
+    }
+
+    public void calcRankingPoint(OPTA_Player player)
+    {
+        ;
     }
 
     public abstract int getID();

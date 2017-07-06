@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.player;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player;
 
 
 import android.os.Bundle;
@@ -23,6 +23,7 @@ public class PlayerHeatmapFragment extends Fragment implements IPlayerFragment
 
     private OPTA_Player player;
     private boolean homeTeam;
+    private HeatMap heatMap;
 
     public static Fragment newInstance(OPTA_Player player)
     {
@@ -32,6 +33,16 @@ public class PlayerHeatmapFragment extends Fragment implements IPlayerFragment
         return fragment;
     }
 
+    @Override
+    public void setNewPlayer(OPTA_Player player)
+    {
+        this.player = player;
+    }
+
+    public void drawStatistics()
+    {
+        HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
+    }
 
     @Nullable
     @Override
@@ -39,16 +50,10 @@ public class PlayerHeatmapFragment extends Fragment implements IPlayerFragment
     {
         View root = inflater.inflate(R.layout.stat_playerinfo_heatmap, container, false);
 
-        HeatMap heatMap = (HeatMap) root.findViewById(R.id.stats_player_heatmap);
+        heatMap = (HeatMap) root.findViewById(R.id.stats_player_heatmap);
         HeatMapHelper.setupHeatMap(heatMap);
-        HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
+        drawStatistics();
 
         return root;
-    }
-
-    @Override
-    public void setNewPlayer(OPTA_Player player)
-    {
-        this.player = player;
     }
 }

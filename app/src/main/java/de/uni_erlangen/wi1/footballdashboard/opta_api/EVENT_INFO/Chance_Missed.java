@@ -25,7 +25,7 @@ public class Chance_Missed extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " missed a chance";
+        return gov.getPlayerName(playerId, teamId) + " missed a chance";
     }
 
 }

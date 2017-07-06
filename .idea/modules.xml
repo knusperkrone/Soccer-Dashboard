@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/libs/circleimageview/circleimageview.iml" filepath="$PROJECT_DIR$/libs/circleimageview/circleimageview.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/circularimageview/circularimageview.iml" filepath="$PROJECT_DIR$/libs/circularimageview/circularimageview.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/expandablerecyclerview-3.0.0-RC1/expandablerecyclerview-3.0.0-RC1.iml" filepath="$PROJECT_DIR$/libs/expandablerecyclerview-3.0.0-RC1/expandablerecyclerview-3.0.0-RC1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/rangeseekbar/rangeseekbar.iml" filepath="$PROJECT_DIR$/libs/rangeseekbar/rangeseekbar.iml" />
     </modules>
   </component>
 </project>

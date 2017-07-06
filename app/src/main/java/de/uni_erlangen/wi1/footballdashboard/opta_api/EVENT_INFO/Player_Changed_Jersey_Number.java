@@ -26,7 +26,7 @@ public class Player_Changed_Jersey_Number extends OPTA_Event
     public String getDescription()
     {
         //Todo: neue Nummer anzeigen
-        return gov.getPlayerName(playerId) + " changed jersey number";
+        return gov.getPlayerName(playerId, teamId) + " changed jersey number";
     }
 
 }

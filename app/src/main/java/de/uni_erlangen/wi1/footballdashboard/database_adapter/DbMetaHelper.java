@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import de.uni_erlangen.wi1.footballdashboard.PlayerTeam;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 
 /**
  * Created by knukro on 6/16/17.
@@ -28,6 +28,8 @@ class DbMetaHelper extends SQLiteOpenHelper
         super(context, DB_NAME, null, 1);
 
         DB_PATH = context.getDatabasePath(DB_NAME).getPath();
+
+        // Is the database in main-Memory?
         if (!new File(DB_PATH).exists()) {
             getReadableDatabase(); // Somehow necessary
             if (DatabaseAdapter.copyDatabase(context, DB_PATH, DB_NAME))
@@ -52,7 +54,6 @@ class DbMetaHelper extends SQLiteOpenHelper
 
     void getMetaData(GameGovernor.GameGovernorData data, String gameId)
     {
-
         final String query = "SELECT thome.ID, thome.Name, taway.ID, taway.Name, first_half_length, second_half_length " +
                 " FROM Game " +
                 " JOIN Team as thome " +
@@ -63,18 +64,30 @@ class DbMetaHelper extends SQLiteOpenHelper
 
         openDatabase();
         Cursor cursor = mDatabase.rawQuery(query, new String[]{gameId});
+
+        // Get data from the first row
         cursor.moveToFirst();
-        data.homeTeam = new PlayerTeam(cursor.getInt(0), cursor.getString(1), true);
-        data.awayTeam = new PlayerTeam(cursor.getInt(2), cursor.getString(3), false);
+
+        data.homeTeam = new OPTA_Team(
+                cursor.getInt(0), // TeamID
+                cursor.getString(1), // Team Name
+                true); // HomeTeam
+        data.awayTeam = new OPTA_Team(
+                cursor.getInt(2), // TeamID
+                cursor.getString(3),  // Team Name
+                false); // Away Team
+
+        // Depreciated?
         data.firstHalfLength = cursor.getInt(3);
         data.secondHalfLength = cursor.getInt(5);
+
         cursor.close();
         closeDatabase();
     }
 
     void getPlayerNames(SparseArray<OPTA_Player> players)
     {
-        // Create dynamic query
+        // Create dynamic query for every playerID
         StringBuilder getPlayers = new StringBuilder("SELECT * FROM Player WHERE ");
         for (int i = 0; i < players.size() - 1; i++) {
             getPlayers.append("ID == ");
@@ -87,10 +100,13 @@ class DbMetaHelper extends SQLiteOpenHelper
         // Evaluate query
         openDatabase();
         Cursor cursor = mDatabase.rawQuery(getPlayers.toString(), new String[]{ });
+        // Iterate over cursor
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            players.get(cursor.getInt(0))
-                    .setName(cursor.getString(1), cursor.getString(2), cursor.getString(3));
+            players.get(
+                    cursor.getInt(0)) // PlayerID
+                    .setName(cursor.getString(1), cursor.getString(2), cursor.getString(3)); // Name
         }
+
         cursor.close();
         closeDatabase();
     }

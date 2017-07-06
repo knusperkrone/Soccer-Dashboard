@@ -23,7 +23,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
  * Created by knukro on 6/16/17.
  */
 
-public class LiveEventListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, OPTA_Qualifier, LiveEventListAdapter.ViewHolderEvent, LiveEventListAdapter.ViewHolderQualifier>
+public class LiveTeamListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, OPTA_Qualifier, LiveTeamListAdapter.ViewHolderEvent, LiveTeamListAdapter.ViewHolderQualifier>
 {
 
     private final LayoutInflater inflater;
@@ -31,8 +31,8 @@ public class LiveEventListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, 
     private final ILiveFilter filter;
     private final int teamId;
 
-    public LiveEventListAdapter(@NonNull List<OPTA_Event> parentList, Context context, int teamId,
-                                RecyclerView parent, @NonNull ILiveFilter filter)
+    public LiveTeamListAdapter(@NonNull List<OPTA_Event> parentList, Context context, int teamId,
+                               RecyclerView parent, @NonNull ILiveFilter filter)
     {
         super(parentList);
         this.teamId = teamId;

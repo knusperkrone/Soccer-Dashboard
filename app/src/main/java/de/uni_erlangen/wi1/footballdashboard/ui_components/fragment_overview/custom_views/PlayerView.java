@@ -1,12 +1,12 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.custom_views;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -32,7 +32,7 @@ public class PlayerView extends LinearLayout
     private TextView playerName;
     private TextView indicatorCaptain;
     private View indicatorCard;
-    private boolean isHeatmapMode = false;
+    private boolean isClickedMode = false;
     private boolean isBest = false;
     private boolean isWorst = false;
     private int currPoints;
@@ -42,13 +42,13 @@ public class PlayerView extends LinearLayout
     public PlayerView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        paint.setColor(Color.BLACK);
         init();
     }
 
     private void init()
     {
         inflate(getContext(), R.layout.view_player, this);
+        paint.setColor(Color.BLACK);
         playerImage = (CircularImageView) findViewById(R.id.playerImage);
         playerName = (TextView) findViewById(R.id.playerName);
         indicatorCaptain = (TextView) findViewById(R.id.playerCaptain);
@@ -65,17 +65,17 @@ public class PlayerView extends LinearLayout
 
     public void setDefaultMode()
     {
-        isHeatmapMode = false;
+        isClickedMode = false;
         updateColorOverlay();
     }
 
-    public void setHeatmapMode()
+    public void setClickedMode()
     {
-        isHeatmapMode = true;
+        isClickedMode = true;
         clearOverLay();
     }
 
-    public void checkLightStatus()
+    public void updateCircleLight()
     {
         int oldPoints = currPoints;
         currPoints = mappedPlayer.getRankingPoints();
@@ -96,7 +96,7 @@ public class PlayerView extends LinearLayout
             setImageOverlay(R.color.average_perf);
     }
 
-    public void isTop()
+    public void setTop()
     {
         if (!isBest)
             setBorderColor(R.color.best_perf);
@@ -104,19 +104,50 @@ public class PlayerView extends LinearLayout
         isWorst = false;
     }
 
-    public void isAverage()
+    public void setAverage()
     {
         if (isBest || isWorst)
             setBorderColor(R.color.default_border_color);
         isBest = isWorst = false;
     }
 
-    public void isBad()
+    public void setBad()
     {
         if (!isWorst)
             setBorderColor(R.color.worst_perf);
         isWorst = true;
         isBest = false;
+    }
+
+    public int[] getBorderCoords(@NonNull int[] thisVector, int[] inVector)
+    {
+        // Get Coordinates of playerImage center
+        getMiddleCoords(thisVector);
+        // Get size of playerImage - offset for arrowHead
+        double circleWidth = playerImage.getWidth() / 2 - 10;
+        // Calculate angle between @thisVector and @inVector
+        double angle = getAngle(inVector, thisVector);
+
+        // Don't overdraw the target playerImage
+        if (angle < 180)
+            circleWidth -= playerImage.getWidth();
+
+        // Save new x/y coordinates
+        double circleX = thisVector[0] + circleWidth * Math.cos(angle);
+        double circleY = thisVector[1] + circleWidth * Math.sin(angle);
+        thisVector[0] = (int) Math.round(circleX);
+        thisVector[1] = (int) Math.round(circleY);
+
+        return thisVector;
+    }
+
+    public int[] getMiddleCoords(@NonNull int[] tmp)
+    {
+        playerImage.getLocationOnScreen(tmp);
+        // TODO: Maybe calculate Center?
+        tmp[0] -= 115;
+        tmp[1] += 20;
+        return tmp;
     }
 
     private void setBorderColor(int colorID)
@@ -143,7 +174,7 @@ public class PlayerView extends LinearLayout
         }
     }
 
-    private void setPlayerImage(Bitmap bm)
+    private void setPlayerImage(@Nullable Bitmap bm)
     {
         if (bm == null) {
             //playerImage.setImageDrawable(); //TODO: Set default image
@@ -156,14 +187,9 @@ public class PlayerView extends LinearLayout
         }
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        canvas.drawLine(0, 50, 350, 50, paint);
-    }
-
-    public boolean isHeatmapMode()
+    public boolean isClickedMode()
     {
-        return isHeatmapMode;
+        return isClickedMode;
     }
 
     private void setCaptain(boolean on)
@@ -179,6 +205,22 @@ public class PlayerView extends LinearLayout
     public OPTA_Player getMappedPlayer()
     {
         return mappedPlayer;
+    }
+
+
+    // Helper to calculate angles
+    private static double getAngle(int[] start, int[] target)
+    {
+        int deltaY = target[1] - start[1];
+        int deltaX = target[0] - start[0];
+
+        // Trunk angle
+        double a = Math.atan2(deltaY, deltaX);
+
+        while (a < 0.0) {
+            a += Math.PI * 2;
+        }
+        return a;
     }
 
 }

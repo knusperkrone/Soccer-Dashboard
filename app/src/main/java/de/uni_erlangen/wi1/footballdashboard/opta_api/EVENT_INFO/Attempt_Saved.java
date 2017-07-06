@@ -25,6 +25,6 @@ public class Attempt_Saved extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Shot by " + gov.getPlayerName(playerId) + " was saved";
+        return "Shot by " + gov.getPlayerName(playerId, teamId) + " was saved";
     }
 }

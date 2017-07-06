@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import de.uni_erlangen.wi1.footballdashboard.R;
@@ -22,9 +21,9 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.custom_views.TabIconView;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.graph_adapter.PlayerStatsViewPagerAdapter;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event.LiveEventListAdapter;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event.LiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter.PlayerStatsViewPagerAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.ILiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
 
 /**
  * Created by knukro on 6/18/17.
@@ -33,37 +32,43 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event.LiveF
 public class PlayerInfoFragment extends Fragment
 {
 
-    private final List<OPTA_Event> passedActions = new LinkedList<>();
     private OPTA_Player player;
+    private int teamId;
 
-    private PlayerStatsViewPagerAdapter playerAdapter;
-    private RecyclerView playerActions;
+    private PlayerStatsViewPagerAdapter playerStatsAdapter;
+    private RecyclerView playerLiveList;
     private TextView name, position, number;
     private CircleImageView image;
+    boolean init = false;
 
-    public static Fragment newInstance(OPTA_Player player)
+    public static Fragment newInstance(OPTA_Player player, int teamId)
     {
-        // TODO: Check for already inited instance
         PlayerInfoFragment frag = new PlayerInfoFragment();
-        frag.setValues(player);
+        frag.setValues(player, teamId);
         return frag;
     }
 
-    public void setValues(OPTA_Player player)
+    public void refreshStatistics()
+    {
+        playerStatsAdapter.refreshActiveItem();
+    }
+
+    public void setValues(OPTA_Player player, int teamId)
     {
         this.player = player;
-        if (name != null) // Already inited?
+        this.teamId = teamId;
+        if (init) // onCreateView() already setted up everything
             initPlayerData();
     }
 
     private void initPlayerData()
     {
-        // Player Info
+        // Setup Player Info
         name.setText(player.getName());
         position.setText(String.valueOf(player.getPosition()));
         number.setText(String.valueOf(player.getShirtNumber()));
-        image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.lloris));
-        // Set Border Color
+        image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.lloris)); //TODO: Dynamically!
+        // Set Border Color according to Card
         if (player.hasYellowCard())
             image.setBorderColor(ContextCompat.getColor(getContext(), R.color.playerinfo_yellow));
         else if (player.hasRedCard())
@@ -71,17 +76,22 @@ public class PlayerInfoFragment extends Fragment
         else
             image.setBorderColor(ContextCompat.getColor(getContext(), R.color.playerinfo_normal));
 
-        // Player actionList
-        passedActions.clear();
+        // Create a list with all passed event's for this Player
         StatusBar bar = StatusBar.getInstance();
-        int currTime = bar.currTime;
+        int maxTime = bar.getMaxRange();
+        int minTime = bar.getMinRange();
+        LinkedList<OPTA_Event> passedPlayerActions = new LinkedList<>();
+
         for (OPTA_Event event : player.getActions()) {
-            if (event.getCRTime() > currTime)
-                break;
-            passedActions.add(0, event);
+            if (event.getCRTime() < minTime)
+                continue; // Not quite yet
+            if (event.getCRTime() > maxTime)
+                break; // That's enough now
+            passedPlayerActions.add(0, event);
         }
-        LiveEventListAdapter adapter = new LiveEventListAdapter(passedActions, getContext(),
-                playerActions, new LiveFilter()
+        // Create a liveListAdapter, with parsed data as base
+        LiveTeamListAdapter adapter = new LiveTeamListAdapter(passedPlayerActions, getContext(),
+                teamId, playerLiveList, new ILiveFilter()
         {
             @Override
             public boolean isValid(OPTA_Event event)
@@ -90,12 +100,13 @@ public class PlayerInfoFragment extends Fragment
 
             }
         });
-        playerActions.setAdapter(adapter);
-        bar.setLiveEventListAdapter(adapter);
+        // Set and register LiveListAdapter
+        playerLiveList.setAdapter(adapter);
+        bar.setLiveTeamListAdapter(adapter);
 
-        // Statistic View
-        if (playerAdapter != null)
-            playerAdapter.setNewPlayer(player);
+        // Also change player for statisticsViewPager
+        if (playerStatsAdapter != null)
+            playerStatsAdapter.setNewPlayer(player);
     }
 
     @Nullable
@@ -104,28 +115,31 @@ public class PlayerInfoFragment extends Fragment
     {
         final View root = inflater.inflate(R.layout.fragment_detail_playerinfo, container, false);
 
-        // Player liveList
-        playerActions = (RecyclerView) root.findViewById(R.id.details_player_playerlist);
-        playerActions.setLayoutManager(new LinearLayoutManager(getContext()));
-        playerActions.setHasFixedSize(true);
-        // PlayerInfo
+        // Setup LiveList
+        playerLiveList = (RecyclerView) root.findViewById(R.id.details_player_playerlist);
+        playerLiveList.setLayoutManager(new LinearLayoutManager(getContext()));
+        playerLiveList.setHasFixedSize(true);
+        // BInd view references
         name = (TextView) root.findViewById(R.id.details_player_info_name);
         position = (TextView) root.findViewById(R.id.details_player_info_pos);
         number = (TextView) root.findViewById(R.id.details_player_info_number);
         image = (CircleImageView) root.findViewById(R.id.details_player_info_image);
-        initPlayerData(); // Set values
+        init = true;
 
-        //Statistics
+        // Fill references
+        initPlayerData();
+
+        // Setup static viewPager
         TabLayout mTabLayout = (TabLayout) root.findViewById(R.id.details_player_tab);
         ViewPager statisticPager = (ViewPager) root.findViewById(R.id.details_player_viewpager);
-        playerAdapter = new PlayerStatsViewPagerAdapter(getFragmentManager(), player);
-        statisticPager.setAdapter(playerAdapter);
+        playerStatsAdapter = new PlayerStatsViewPagerAdapter(getFragmentManager(), player);
+        statisticPager.setAdapter(playerStatsAdapter);
         mTabLayout.setupWithViewPager(statisticPager);
-        // Fill with Icons!
+
+        // Fill tabLayout with nice round Icons TODO: Create nice icons
         for (int i = 0; i < mTabLayout.getTabCount(); i++) {
             mTabLayout.getTabAt(i).setCustomView(new TabIconView(getContext(), null));
         }
-
 
         return root;
     }

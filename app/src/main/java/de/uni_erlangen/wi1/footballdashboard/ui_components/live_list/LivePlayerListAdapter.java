@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.live_list;
 
 
 import android.annotation.SuppressLint;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.PlayerInfoFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.TeamInfoFragment;
 
@@ -35,6 +36,7 @@ public class LivePlayerListAdapter extends
     private int selectedPosition = -1;
     private final int clickedColor, defaultColor;
     private OPTA_Player[] rankedPlayers;
+
 
     public LivePlayerListAdapter(FragmentManager fm, Context context, OPTA_Team team)
     {
@@ -59,19 +61,19 @@ public class LivePlayerListAdapter extends
             selectedPosition = -1;
 
         } else if (selectedPosition != -1) {
-            // There is a selected player, but position in array will be changed after refresh
+            // There is a selected player, but position in array will be changed after refreshStatistics
             selectedPlayer = rankedPlayers[selectedPosition];
         }
 
-        // Get current sorted list and refresh view
-        rankedPlayers = team.getRankedPlayers();
+        // Get current sorted list and refreshStatistics view
+        rankedPlayers = team.getRankedPlayers(StatusBar.getInstance().getMaxRange());
         notifyDataSetChanged();
 
         // Restore selected player, if there was one and the team didn't change!
         if (!newTeam && selectedPlayer != null) {
             // Linear search for the selected player
             int i = 0;
-            for (OPTA_Player player : team.getRankedPlayers()) {
+            for (OPTA_Player player : rankedPlayers) {
                 if (selectedPlayer.getId() == player.getId()) {
                     selectedPosition = i;
                     break;
@@ -117,10 +119,8 @@ public class LivePlayerListAdapter extends
                     // This view is already clicked -> show TeamInfoFragment again
                     selectedPosition = -1;
                     fm.beginTransaction()
-                            .addToBackStack(null)
                             .replace(R.id.detail_content, TeamInfoFragment.newInstance(team))
                             .commit();
-
                 } else {
                     // This view just got clicked -> show (new|old) playerInfo Fragment
                     // Mark this viewHolder as clicked

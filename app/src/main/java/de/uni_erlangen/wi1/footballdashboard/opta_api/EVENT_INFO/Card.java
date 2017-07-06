@@ -30,18 +30,18 @@ public class Card extends OPTA_Event
     @Override
     public String getDescription()
     {
-        for(OPTA_Qualifier q : qualifiers){
-            if(q instanceof Red_Card){
-                return gov.getPlayerName(playerId) + " received a red card";
+        for (OPTA_Qualifier q : qualifiers) {
+            if (q instanceof Red_Card) {
+                return gov.getPlayerName(playerId, teamId) + " received a red card";
             }
-            if(q instanceof Second_Yellow){
-                return gov.getPlayerName(playerId) + " received a second yellow card";
+            if (q instanceof Second_Yellow) {
+                return gov.getPlayerName(playerId, teamId) + " received a second yellow card";
             }
-            if(q instanceof Yellow_Card){
-                return gov.getPlayerName(playerId) + " received a yellow card";
+            if (q instanceof Yellow_Card) {
+                return gov.getPlayerName(playerId, teamId) + " received a yellow card";
             }
         }
-        return gov.getPlayerName(playerId) + " received a card";
+        return gov.getPlayerName(playerId, teamId) + " received a card";
     }
 
 }

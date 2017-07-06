@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.list_live_event;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.live_list;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 
@@ -6,7 +6,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
  * Created by knukro on 6/19/17.
  */
 
-public interface LiveFilter
+public interface ILiveFilter
 {
     boolean isValid(OPTA_Event event);
 }

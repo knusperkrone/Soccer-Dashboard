@@ -26,7 +26,7 @@ public class Player_Changed_Position extends OPTA_Event
     public String getDescription()
     {
         //Todo: wohin ist der Spieler gewechselt?
-        return gov.getPlayerName(playerId) + " changed position";
+        return gov.getPlayerName(playerId, teamId) + " changed position";
     }
 
 }

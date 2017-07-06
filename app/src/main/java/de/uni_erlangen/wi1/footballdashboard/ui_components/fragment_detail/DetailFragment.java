@@ -8,43 +8,52 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.uni_erlangen.wi1.footballdashboard.PlayerTeam;
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.PlayerInfoFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.TeamInfoFragment;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.list_ranked_player.RankedPlayerListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LivePlayerListAdapter;
 
 public class DetailFragment extends Fragment
 {
 
-    private RankedPlayerListAdapter rankedPlayerListAdapter;
-    private TeamInfoFragment teamInfoFragment;
+    private LivePlayerListAdapter rankedPlayerListAdapter;
+    private final GameGovernor gov = GameGovernor.getInstance();
 
     public static DetailFragment newInstance()
     {
         return new DetailFragment();
     }
 
-    public void prepare()
+    public void setActive()
     {
-        // Prepares View (Fragments) when user scroll
-        PlayerTeam team = GameGovernor.getInstance().getDisplayedTeam();
+        // Prepares View (Fragments) when user scrolls
+        OPTA_Team team = GameGovernor.getInstance().getDisplayedTeam();
+        // Get active fragment
+        Fragment unknownFrag = getFragmentManager().findFragmentById(R.id.detail_content);
 
-        if (rankedPlayerListAdapter.changeTeam(team)) {
-            // Team changed but playerView is shown
-            Fragment playerFrag = getFragmentManager().findFragmentById(R.id.detail_content);
-            if (playerFrag instanceof PlayerInfoFragment) {
-                // Need to create a new Fragment (?)
-                teamInfoFragment = teamInfoFragment.newInstance(team);
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.detail_content, teamInfoFragment)
+        if (rankedPlayerListAdapter.changedTeam(team)) {
+            // We changed the team!
+            if (unknownFrag instanceof PlayerInfoFragment) {
+                // We have a player Fragment, but want a team Fragment -> replace it
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.detail_content,
+                                TeamInfoFragment.newInstance(gov.getDisplayedTeam()))
                         .commit();
-                return; // Team is already set
+            } else {
+                // We got already a team Fragment there
+                ((TeamInfoFragment) unknownFrag).changeTeam(team);
             }
-        }
 
-        teamInfoFragment.changeTeam(team); // Set new team and redraw old fragment
+        } else if (unknownFrag instanceof PlayerInfoFragment) {
+            // We didn't change the team and have Player statistic open
+            ((PlayerInfoFragment) unknownFrag).refreshStatistics();
+        } else {
+            // We didn't change the team and have Team statistic open
+            ((TeamInfoFragment) unknownFrag).refreshStatistics();
+        }
     }
 
     @Override
@@ -56,14 +65,15 @@ public class DetailFragment extends Fragment
         RecyclerView mainList = (RecyclerView) root.findViewById(R.id.main_list);
         mainList.setHasFixedSize(true);
         mainList.setLayoutManager(new LinearLayoutManager(getContext()));
-        rankedPlayerListAdapter = new RankedPlayerListAdapter(getFragmentManager(), getContext(),
+        rankedPlayerListAdapter = new LivePlayerListAdapter(getFragmentManager(), getContext(),
                 GameGovernor.getInstance().getDisplayedTeam());
         mainList.setAdapter(rankedPlayerListAdapter);
 
-        // Create initial TeamFragment
-        teamInfoFragment = TeamInfoFragment.newInstance(GameGovernor.getInstance().getDisplayedTeam());
-        getFragmentManager().beginTransaction()
-                .replace(R.id.detail_content, teamInfoFragment).commit();
+        // Create and show a TeamFragment
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.detail_content, TeamInfoFragment.newInstance(gov.getDisplayedTeam()))
+                .commit();
 
         return root;
     }

@@ -28,10 +28,10 @@ public class Foul extends OPTA_Event
     {
         for (OPTA_Qualifier q : qualifiers) {
             if (q instanceof Hand) {
-                return "Handball by " + gov.getPlayerName(playerId);
+                return "Handball by " + gov.getPlayerName(playerId, teamId);
             }
         }
-        return outcome ? gov.getPlayerName(playerId) + " was fouled" : "Foul by " + gov.getPlayerName(playerId);
+        return outcome ? gov.getPlayerName(playerId, teamId) + " was fouled" : "Foul by " + gov.getPlayerName(playerId, teamId);
     }
 
 }

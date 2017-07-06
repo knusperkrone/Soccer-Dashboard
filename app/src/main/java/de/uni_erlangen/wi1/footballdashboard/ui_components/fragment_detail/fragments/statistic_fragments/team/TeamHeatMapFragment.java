@@ -1,9 +1,10 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.statistic_fragments.team;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team;
 
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 
 /**
  * Created by knukro on 6/20/17.
+ * Draws a heatMap for the whole Team, in the seekBar range and has some filter options
  */
 
 public class TeamHeatMapFragment extends Fragment implements ITeamFragment
@@ -36,20 +38,23 @@ public class TeamHeatMapFragment extends Fragment implements ITeamFragment
     }
 
     @Override
-    public void changeTeam(OPTA_Team team)
+    public void setNewTeam(OPTA_Team team)
     {
         this.team = team;
-        drawHeatMap();
     }
 
-    private void drawHeatMap()
+    @Override
+    public void drawStatistics()
     {
+        Log.d("HEATMAP_TEAM", "Redraw Heatmap");
+
         heatMap.clearData();
         StatusBar bar = StatusBar.getInstance();
         int minTime = bar.getMinRange();
         int maxTime = bar.getMaxRange();
 
-        for (OPTA_Player player : team.getRankedPlayers()) {
+        OPTA_Player[] sortedPlayers = team.getRankedPlayers(StatusBar.getInstance().getMaxRange());
+        for (OPTA_Player player : sortedPlayers) {
             // TODO: POSITION filter
             // TODO: Count dataPoints, to adjust heatMapDataPoint value
             HeatMapHelper.addDataPointsToHeatmap(player, heatMap, homeTeam, minTime, maxTime);
@@ -65,7 +70,8 @@ public class TeamHeatMapFragment extends Fragment implements ITeamFragment
 
         heatMap = (HeatMap) root.findViewById(R.id.stats_team_heatmap);
         HeatMapHelper.setupHeatMap(heatMap);
-        drawHeatMap();
+
+        drawStatistics();
 
         return root;
     }

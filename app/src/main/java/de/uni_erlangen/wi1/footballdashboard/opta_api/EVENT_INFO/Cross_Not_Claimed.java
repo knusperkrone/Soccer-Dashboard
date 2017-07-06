@@ -25,7 +25,7 @@ public class Cross_Not_Claimed extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Unsuccessful catch by " + gov.getPlayerName(playerId);
+        return "Unsuccessful catch by " + gov.getPlayerName(playerId, teamId);
     }
 
 }

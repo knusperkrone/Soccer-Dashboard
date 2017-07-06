@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.helper;
+package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
 import android.util.Log;
 import android.util.SparseArray;
@@ -9,13 +9,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Pass;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
 
 
-public class PlayerTeam
+public class OPTA_Team
 {
 
     private final int teamId;
@@ -30,7 +27,7 @@ public class PlayerTeam
     private OPTA_Player[] rankedPlayers;
 
 
-    public PlayerTeam(int teamId, String teamName, boolean homeTeam)
+    public OPTA_Team(int teamId, String teamName, boolean homeTeam)
     {
         this.teamId = teamId;
         this.homeTeam = homeTeam;
@@ -66,18 +63,21 @@ public class PlayerTeam
         selectedView.setDefaultMode();
     }
 
-    public OPTA_Player[] getRankedPlayers()
+    public OPTA_Player[] getRankedPlayers(int timeInSeconds)
     {
-        int index = StatusBar.getInstance().currTime / 10;
-        if (playerRankings.size() >= index)
+        // Returns the ordered array for the time @timeInSeconds
+        int index = timeInSeconds / 10;
+        if (playerRankings.size() <= index)
             return playerRankings.get(playerRankings.size() - 1);
         return playerRankings.get(index);
     }
 
-    public void updateLightColors()
+    public void updateLightColors(int timeInSeconds)
     {
-        int i = 0; // Rank
-        for (OPTA_Player player : getRankedPlayers()) {
+        // Updates the views to their cached ranking @timeInSeconds
+        OPTA_Player[] sortedPlayers = getRankedPlayers(timeInSeconds);
+        int i = 0; // Rank counter
+        for (OPTA_Player player : sortedPlayers) {
 
             if (player.mappedView != null) {
                 // Update playerImage overlay color
@@ -95,13 +95,15 @@ public class PlayerTeam
         }
     }
 
-    public SparseArray getPassesFrom(OPTA_Player giver)
+    public SparseArray getPassesBy(OPTA_Player giver, int minTime, int maxTime)
     {
         SparseArray ret = new SparseArray(rankedPlayers.length);
-        int currTime = StatusBar.getInstance().currTime;
 
         boolean lastWasPass = false;
         for (OPTA_Event currEvent : events) {
+            if (currEvent.getCRTime() < minTime)
+                continue; // Not quite there yet
+
             if (lastWasPass) {
                 //TODO: Filter out data noise
                 try {
@@ -113,30 +115,37 @@ public class PlayerTeam
                 }
             }
 
-            if (currEvent.getCRTime() > currTime)
-                break;
-            if (currEvent instanceof Pass && currEvent.getPlayerId() == giver.getId())
+            if (currEvent.getCRTime() > maxTime)
+                break; // We are finished now
+
+            // Check if currEvent is a successful pass by the @giver player
+            if (currEvent instanceof Pass && currEvent.isSuccess()
+                    && currEvent.getPlayerId() == giver.getId())
                 lastWasPass = true;
         }
         return ret;
     }
 
-    public SparseArray getPassesFor(OPTA_Player receiver)
+    public SparseArray getPassesFor(OPTA_Player receiver, int minTime, int maxTime)
     {
         SparseArray ret = new SparseArray(rankedPlayers.length);
-        int currTime = StatusBar.getInstance().currTime;
 
         OPTA_Event lastPass = null;
         for (OPTA_Event currEvent : events) {
+            if (currEvent.getCRTime() < minTime)
+                continue; // Not quite there yet
+
+            // The last event was a successful pass and the next event.Id is @receiver id
             if (lastPass != null && currEvent.getPlayerId() == receiver.getId()) {
                 int giverId = playerSparseArray.get(lastPass.getPlayerId()).getId();
                 ret.put(giverId, (int) ret.get(giverId, 0) + 1);
                 lastPass = null;
             }
 
-            if (currEvent.getCRTime() > currTime)
-                break;
-            if (currEvent instanceof Pass)
+            if (currEvent.getCRTime() > maxTime)
+                break; // We are finished now
+
+            if (currEvent instanceof Pass && currEvent.isSuccess())
                 lastPass = currEvent;
         }
 
@@ -177,6 +186,11 @@ public class PlayerTeam
 
     private void evaluateRanking()
     {
+        /*
+        Iterate over all players until all are on the same time level, then sort them
+        within their ranking and save the ranking Position for every 10 Seconds
+        */
+
         // Fill a reference and index array for easy referencing and mapping
         OPTA_Player[] players = new OPTA_Player[playerSparseArray.size()];
         int[] lastEventIndex = new int[playerSparseArray.size()];
@@ -196,11 +210,7 @@ public class PlayerTeam
         int currTime = 10;
 
         do {
-            /*
-            Iterate over all players until all are on the same time level, then sort them
-            within their ranking and save the ranking Position for every 10 Seconds
-            */
-
+            // Start iteration over players
             int i = 0;
             for (OPTA_Player currPlayer : players) {
                 List<OPTA_Event> actions = currPlayer.getActions();

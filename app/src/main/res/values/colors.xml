@@ -10,11 +10,11 @@
     <color name="card_color_dark">#F1D600</color>
 
     <color name="default_border_color">#FFFF</color>
-    <color name="best_perf">#00FF00</color>
-    <color name="good_perf">#7500FF00</color>
+    <color name="best_perf">#00e676</color>
+    <color name="good_perf">#755efc82</color>
     <color name="average_perf">#60FFEE66</color>
-    <color name="bad_perf">#75FF2222</color>
-    <color name="worst_perf">#FF2222</color>
+    <color name="bad_perf">#75ff6434</color>
+    <color name="worst_perf">#dd2c00</color>
 
     <color name="playerinfo_normal">#E8E8E8</color>
     <color name="playerinfo_yellow">#FFEE00</color>

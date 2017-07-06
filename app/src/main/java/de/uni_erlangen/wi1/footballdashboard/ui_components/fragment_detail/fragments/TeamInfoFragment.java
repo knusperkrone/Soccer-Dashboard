@@ -6,15 +6,14 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.uni_erlangen.wi1.footballdashboard.PlayerTeam;
 import de.uni_erlangen.wi1.footballdashboard.R;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.custom_views.TabIconView;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.graph_adapter.TeamStatsViewPagerAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter.TeamStatsViewPagerAdapter;
 
 /**
  * Created by knukro on 6/18/17.
@@ -23,22 +22,27 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.graph
 public class TeamInfoFragment extends Fragment
 {
 
-    private PlayerTeam team;
+    private OPTA_Team team;
     private TeamStatsViewPagerAdapter teamAdapter;
 
-    public static TeamInfoFragment newInstance(PlayerTeam team)
+    public static TeamInfoFragment newInstance(@NonNull OPTA_Team team)
     {
         TeamInfoFragment frag = new TeamInfoFragment();
         frag.team = team;
         return frag;
     }
 
-    public void changeTeam(@NonNull PlayerTeam team)
+    public void changeTeam(@NonNull OPTA_Team team)
     {
-        Log.d("[TEAM_INFO_FRAG", "changeTeam() called");
         this.team = team;
         if (teamAdapter != null)
             teamAdapter.changeTeam(team);
+    }
+
+    public void refreshStatistics()
+    {
+        if (teamAdapter != null)
+            teamAdapter.refreshActiveItem();
     }
 
     @Nullable
@@ -47,12 +51,13 @@ public class TeamInfoFragment extends Fragment
     {
         final View root = inflater.inflate(R.layout.fragment_detail_teaminfo, container, false);
 
+        // Setup statistics ViewPager
         TabLayout mTabLayout = (TabLayout) root.findViewById(R.id.details_team_tab);
         ViewPager statisticPager = (ViewPager) root.findViewById(R.id.details_team_viewpager);
         teamAdapter = new TeamStatsViewPagerAdapter(getFragmentManager(), team);
         statisticPager.setAdapter(teamAdapter);
         mTabLayout.setupWithViewPager(statisticPager);
-        // Fill with Icons!
+        // Fill tabLayout with nice round Icons TODO: Create nice icons
         for (int i = 0; i < mTabLayout.getTabCount(); i++) {
             mTabLayout.getTabAt(i).setCustomView(new TabIconView(getContext(), null));
         }

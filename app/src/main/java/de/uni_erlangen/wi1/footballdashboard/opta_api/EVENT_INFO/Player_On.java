@@ -27,12 +27,12 @@ public class Player_On extends OPTA_Event
     @Override
     public String getDescription()
     {
-        for(OPTA_Qualifier q : qualifiers){
-            if(q instanceof Injury){
-                return gov.getPlayerName(playerId) + " was substituted on for an injured player";
+        for (OPTA_Qualifier q : qualifiers) {
+            if (q instanceof Injury) {
+                return gov.getPlayerName(playerId, teamId) + " was substituted on for an injured player";
             }
         }
-        return gov.getPlayerName(playerId) + " came on as a substitute";
+        return gov.getPlayerName(playerId, teamId) + " came on as a substitute";
     }
 
 }

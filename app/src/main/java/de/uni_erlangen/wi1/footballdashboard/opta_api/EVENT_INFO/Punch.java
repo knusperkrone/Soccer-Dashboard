@@ -25,7 +25,7 @@ public class Punch extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " punched the ball clear";
+        return gov.getPlayerName(playerId, teamId) + " punched the ball clear";
     }
 
 }

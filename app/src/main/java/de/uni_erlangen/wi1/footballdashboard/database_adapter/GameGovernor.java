@@ -1,10 +1,11 @@
 package de.uni_erlangen.wi1.footballdashboard.database_adapter;
 
 import android.content.Context;
-import android.util.SparseArray;
 
-import de.uni_erlangen.wi1.footballdashboard.PlayerTeam;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
+import java.util.List;
+
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 
 /**
@@ -19,21 +20,19 @@ public class GameGovernor
 
     private GameGovernor()
     {
-
+        // Empty constructor
     }
 
     static class GameGovernorData
     {
+        // Just a struct for referencing
         int homeLayout, awayLayout;
         int firstHalfLength, secondHalfLength;
         int period = 1;
         int gameId;
 
-        PlayerTeam homeTeam;
-        PlayerTeam awayTeam;
-
-        //final SparseArray<OPTA_Player> homePlayers = new SparseArray<>();
-        //final SparseArray<OPTA_Player> awayPlayers = new SparseArray<>();
+        OPTA_Team homeTeam;
+        OPTA_Team awayTeam;
     }
 
     public static GameGovernor getInstance()
@@ -45,12 +44,28 @@ public class GameGovernor
 
     public void setGame(Context context, String gameId)
     {
-        //data.homePlayers.clear();
-        //data.awayPlayers.clear();
         data.gameId = Integer.valueOf(gameId);
-
         DatabaseAdapter.getInstance().setGame(context, data, gameId);
+    }
 
+    public String getPlayerName(int playerID, int teamID)
+    {
+        // Check the right team and return value if it's there
+        String tmp = (teamID == data.homeTeam.getId()) ?
+                data.homeTeam.getPlayerName(playerID) :
+                data.awayTeam.getPlayerName(playerID);
+        return (tmp == null) ? "" : tmp;
+    }
+
+    public OPTA_Team getDisplayedTeam()
+    {
+        return (StatusBar.getInstance().isShowingHome()) ? data.homeTeam : data.awayTeam;
+    }
+
+    public int getLatestEventTime()
+    {
+        List<OPTA_Event> home = getHomeTeam().getEvents();
+        return home.get(home.size() - 1).getCRTime();
     }
 
     boolean isHomeTeamId(int teamId)
@@ -58,41 +73,12 @@ public class GameGovernor
         return teamId == data.homeTeam.getId();
     }
 
-    public SparseArray<OPTA_Player> getHomePlayers()
-    {
-        return data.homeTeam.getPlayers();
-    }
-
-    public SparseArray<OPTA_Player> getAwayPlayers()
-    {
-        return data.awayTeam.getPlayers();
-    }
-
-    public String getPlayerName(int playerID)
-    {
-        String tmp = data.homeTeam.getPlayerName(playerID);
-        if (tmp == null)
-            tmp = data.awayTeam.getPlayerName(playerID);
-        return (tmp == null) ? "" : tmp;
-    }
-
-    public int getHalfTimeLength()
-    {
-        return 45;
-        //TODO: return (period == 1) ? firstHalfLength : secondHalfLength;
-    }
-
-    public PlayerTeam getDisplayedTeam()
-    {
-        return (StatusBar.getInstance().isShowingHome()) ? data.homeTeam : data.awayTeam;
-    }
-
-    public PlayerTeam getHomeTeam()
+    public OPTA_Team getHomeTeam()
     {
         return data.homeTeam;
     }
 
-    public PlayerTeam getAwayTeam()
+    public OPTA_Team getAwayTeam()
     {
         return data.awayTeam;
     }

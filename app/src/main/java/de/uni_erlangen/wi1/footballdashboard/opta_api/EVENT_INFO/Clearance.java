@@ -24,7 +24,7 @@ public class Clearance extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Successful clear by " + gov.getPlayerName(playerId) + (outcome ? " ,but possession switches to opponent" : "");
+        return "Successful clear by " + gov.getPlayerName(playerId, teamId) + (outcome ? " ,but possession switches to opponent" : "");
     }
 
 }

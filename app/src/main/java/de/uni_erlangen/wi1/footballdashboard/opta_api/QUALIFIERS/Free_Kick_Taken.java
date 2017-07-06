@@ -20,7 +20,8 @@ public class Free_Kick_Taken extends OPTA_Qualifier
     }
 
     @Override
-    public String describeContent() {
+    public String describeContent()
+    {
         return null;
     }
 }

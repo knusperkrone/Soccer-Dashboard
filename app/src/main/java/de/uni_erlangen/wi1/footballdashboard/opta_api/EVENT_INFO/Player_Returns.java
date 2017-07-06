@@ -25,7 +25,7 @@ public class Player_Returns extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " returned on the pitch";
+        return gov.getPlayerName(playerId, teamId) + " returned on the pitch";
     }
 
 }

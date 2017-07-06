@@ -25,7 +25,7 @@ public class Player_Retired extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " was forced to leave the game and can't be substituted";
+        return gov.getPlayerName(playerId, teamId) + " was forced to leave the game and can't be substituted";
     }
 
 }

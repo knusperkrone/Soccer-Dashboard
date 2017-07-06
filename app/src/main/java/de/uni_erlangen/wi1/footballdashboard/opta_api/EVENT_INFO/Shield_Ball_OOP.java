@@ -25,7 +25,7 @@ public class Shield_Ball_OOP extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return gov.getPlayerName(playerId) + " shielded the ball from opponent";
+        return gov.getPlayerName(playerId, teamId) + " shielded the ball from opponent";
     }
 
 }
