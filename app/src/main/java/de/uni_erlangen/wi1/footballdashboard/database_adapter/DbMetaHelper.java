@@ -8,6 +8,8 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
@@ -52,7 +54,7 @@ class DbMetaHelper extends SQLiteOpenHelper
     }
 
 
-    void getMetaData(GameGovernor.GameGovernorData data, String gameId)
+    void getTeam(GameGovernor.GameGovernorData data, String gameId)
     {
         final String query = "SELECT thome.ID, thome.Name, taway.ID, taway.Name, first_half_length, second_half_length " +
                 " FROM Game " +
@@ -77,16 +79,20 @@ class DbMetaHelper extends SQLiteOpenHelper
                 cursor.getString(3),  // Team Name
                 false); // Away Team
 
-        // Depreciated?
-        data.firstHalfLength = cursor.getInt(3);
-        data.secondHalfLength = cursor.getInt(5);
-
         cursor.close();
         closeDatabase();
     }
 
-    void getPlayerNames(SparseArray<OPTA_Player> players)
+    OPTA_Team[] getTeam(String gameId)
     {
+        GameGovernor.GameGovernorData tmp = new GameGovernor.GameGovernorData();
+        getTeam(tmp, gameId);
+        return new OPTA_Team[]{tmp.homeTeam, tmp.awayTeam};
+    }
+
+    void getPlayerNames(OPTA_Team team)
+    {
+        SparseArray<OPTA_Player> players = team.getPlayers();
         // Create dynamic query for every playerID
         StringBuilder getPlayers = new StringBuilder("SELECT * FROM Player WHERE ");
         for (int i = 0; i < players.size() - 1; i++) {
@@ -109,6 +115,34 @@ class DbMetaHelper extends SQLiteOpenHelper
 
         cursor.close();
         closeDatabase();
+    }
+
+    List<GameInfo> getAllGamesForTeam(String teamName, String currGameIdString)
+    {
+        final int currGameId = Integer.valueOf(currGameIdString);
+        final String query = "SELECT game.ID, t1.Name AS HomeTeam, t2.Name AS AwayTeam " +
+                " FROM Game " +
+                " JOIN Team t1 " +
+                " ON t1.ID == game.ID_Team_home " +
+                " JOIN Team t2 " +
+                " ON t2.ID == game.ID_Team_away " +
+                " WHERE" +
+                " HomeTeam == ? OR AwayTeam == ?";
+
+        openDatabase();
+        // Init data structures
+        Cursor cursor = mDatabase.rawQuery(query, new String[]{teamName, teamName});
+        List<GameInfo> gameList = new ArrayList<>(cursor.getCount());
+        // Parse data
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            if (cursor.getInt(0) != currGameId)
+                gameList.add(
+                        new GameInfo(cursor.getInt(0), cursor.getString(1), cursor.getString(2)));
+        }
+        cursor.close();
+        closeDatabase();
+
+        return gameList;
     }
 
 

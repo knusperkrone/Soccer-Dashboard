@@ -26,9 +26,6 @@ public class GameGovernor
     static class GameGovernorData
     {
         // Just a struct for referencing
-        int homeLayout, awayLayout;
-        int firstHalfLength, secondHalfLength;
-        int period = 1;
         int gameId;
 
         OPTA_Team homeTeam;
@@ -105,12 +102,12 @@ public class GameGovernor
 
     public int getHomeLayout()
     {
-        return data.homeLayout;
+        return data.homeTeam.layout;
     }
 
     public int getAwayLayout()
     {
-        return data.awayLayout;
+        return data.awayTeam.layout;
     }
 
 

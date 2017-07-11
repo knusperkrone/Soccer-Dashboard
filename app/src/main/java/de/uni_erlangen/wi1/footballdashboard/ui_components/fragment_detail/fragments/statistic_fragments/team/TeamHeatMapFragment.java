@@ -4,7 +4,6 @@ package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.frag
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,18 +45,17 @@ public class TeamHeatMapFragment extends Fragment implements ITeamFragment
     @Override
     public void drawStatistics()
     {
-        Log.d("HEATMAP_TEAM", "Redraw Heatmap");
-
         heatMap.clearData();
         StatusBar bar = StatusBar.getInstance();
         int minTime = bar.getMinRange();
         int maxTime = bar.getMaxRange();
+        double pointValue = HeatMapHelper.evaluatePointValue(minTime, maxTime);
 
         OPTA_Player[] sortedPlayers = team.getRankedPlayers(StatusBar.getInstance().getMaxRange());
         for (OPTA_Player player : sortedPlayers) {
             // TODO: POSITION filter
             // TODO: Count dataPoints, to adjust heatMapDataPoint value
-            HeatMapHelper.addDataPointsToHeatmap(player, heatMap, homeTeam, minTime, maxTime);
+            HeatMapHelper.addDataPointsToHeatmap(player, heatMap, homeTeam, minTime, maxTime, pointValue);
         }
         heatMap.forceRefresh();
     }

@@ -34,25 +34,25 @@ public class StatusBar
 
     private OnSeekBarChangeAble clickedView;
 
-    private StatusBar(Handler refreshHandler, int maxPeriodTime, TextView timeLabel, TextView goalLabel,
+    private StatusBar(Handler refreshHandler, TextView timeLabel, TextView goalLabel,
                       TextView teamLabel)
     {
         this.refreshHandler = refreshHandler;
         this.teamLabel = teamLabel;
         this.timeLabel = timeLabel;
         this.goalLabel = goalLabel;
-        this.maxPeriodTime = maxPeriodTime;
+        this.maxPeriodTime = GameGovernor.getInstance().getLatestEventTime();
         teamSwitched(0);
 
         currentRange = new int[2];
         rangeListener = new RangeBarOnClickListener(this);
     }
 
-    public static void initInstance(Handler handler, int maxMinutes, TextView timeLabel,
+    public static void initInstance(Handler handler, TextView timeLabel,
                                     TextView goalLabel, TextView teamLabel)
     {
         if (instance == null)
-            instance = new StatusBar(handler, maxMinutes, timeLabel, goalLabel, teamLabel);
+            instance = new StatusBar(handler, timeLabel, goalLabel, teamLabel);
     }
 
     public static StatusBar getInstance()

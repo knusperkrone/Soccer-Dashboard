@@ -131,10 +131,10 @@ public class LivePlayerListAdapter extends
                     Fragment frag = fm.findFragmentById(R.id.detail_content);
                     if (frag instanceof PlayerInfoFragment) {
                         // There is already a playerFragment, adjust the values
-                        ((PlayerInfoFragment) frag).setValues(player, team.getId());
+                        ((PlayerInfoFragment) frag).setValues(team, player);
                     } else {
                         // TeamFragment is shown, replace with PlayerFragment
-                        frag = PlayerInfoFragment.newInstance(player, team.getId());
+                        frag = PlayerInfoFragment.newInstance(team, player);
                         fm.beginTransaction()
                                 .addToBackStack(null)
                                 .replace(R.id.detail_content, frag).commit();

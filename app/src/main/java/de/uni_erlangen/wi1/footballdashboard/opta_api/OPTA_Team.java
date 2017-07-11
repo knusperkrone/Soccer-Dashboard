@@ -1,5 +1,6 @@
 package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -19,6 +20,9 @@ public class OPTA_Team
     private final boolean homeTeam;
     private final String teamName;
 
+    public int layout;
+    public boolean dataFetched = false;
+
     private final SparseArray<OPTA_Player> playerSparseArray;
     private final List<OPTA_Player[]> playerRankings = new ArrayList<>(6 * 90); // Every 10 seconds
 
@@ -35,10 +39,16 @@ public class OPTA_Team
         this.playerSparseArray = new SparseArray<>(22);
     }
 
-    public void setViews(PlayerView[] playerViews)
+    public void setViews(@NonNull PlayerView[] playerViews)
     {
         this.playerViews = playerViews;
         mapToPlayerData();
+    }
+
+    public void setEvents(@NonNull List<OPTA_Event> events)
+    {
+        Log.d("OPTA_TEAM", "Team " + teamName + " received " + events.size() + " events");
+        this.events = events;
         evaluateRanking();
     }
 
@@ -56,11 +66,6 @@ public class OPTA_Team
             }
         }
         return false;
-    }
-
-    public void setUnclicked(PlayerView selectedView)
-    {
-        selectedView.setDefaultMode();
     }
 
     public OPTA_Player[] getRankedPlayers(int timeInSeconds)
@@ -186,6 +191,7 @@ public class OPTA_Team
 
     private void evaluateRanking()
     {
+        Log.d("OPTA_TEAM", getTeamName() + " Evaluating Team Rankings");
         /*
         Iterate over all players until all are on the same time level, then sort them
         within their ranking and save the ranking Position for every 10 Seconds
@@ -263,14 +269,14 @@ public class OPTA_Team
         return homeTeam;
     }
 
+    public void setUnclicked(PlayerView selectedView)
+    {
+        selectedView.setDefaultMode();
+    }
+
     public SparseArray<OPTA_Player> getPlayers()
     {
         return playerSparseArray;
-    }
-
-    public void setEvents(List<OPTA_Event> events)
-    {
-        this.events = events;
     }
 
     public List<OPTA_Event> getEvents()

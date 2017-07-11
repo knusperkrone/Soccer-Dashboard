@@ -17,6 +17,14 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 
 public class ArrowView extends View
 {
+
+    private static final int[] mColors = {
+            Color.parseColor("#c51162"), Color.parseColor("#f50057"), Color.parseColor("#aa00ff"),
+            Color.parseColor("#651fff"), Color.parseColor("#3d5afe"), Color.parseColor("#ff6434"),
+            Color.parseColor("#00b0ff"), Color.parseColor("#1de9b6"), Color.parseColor("#c6ff00"),
+            Color.parseColor("#ffc400"), Color.parseColor("#ff9100"), Color.BLACK
+    };
+
     // Holder for the X/Y coordinates
     final static int[] startCoords = new int[2];
     final static int[] endCoords = new int[2];
@@ -101,44 +109,7 @@ public class ArrowView extends View
         linePaint.setStrokeWidth((float) count);
 
         // Choose color
-        int color;
-        switch (index) {
-            case 0:
-                color = Color.parseColor("#c51162");
-                break;
-            case 1:
-                color = Color.parseColor("#f50057");
-                break;
-            case 2:
-                color = Color.parseColor("#aa00ff");
-                break;
-            case 3:
-                color = Color.parseColor("#651fff");
-                break;
-            case 4:
-                color = Color.parseColor("#3d5afe");
-                break;
-            case 5:
-                color = Color.parseColor("#ff6434");
-                break;
-            case 6:
-                color = Color.parseColor("#00b0ff");
-                break;
-            case 7:
-                color = Color.parseColor("#1de9b6");
-                break;
-            case 8:
-                color = Color.parseColor("#c6ff00");
-                break;
-            case 9:
-                color = Color.parseColor("#ffc400");
-                break;
-            case 10:
-                color = Color.parseColor("#ff9100");
-                break;
-            default:
-                color = Color.BLACK;
-        }
+        int color = mColors[index % mColors.length];
         linePaint.setColor(color);
         headPaint.setColor(color);
 
@@ -169,7 +140,7 @@ public class ArrowView extends View
         // Draw line
         canvas.drawLine(from_x, from_y, to_x, to_y, linePaint);
 
-        // Draw arrowHead
+        // Setup arrowHead
         Path path = new Path();
         path.setFillType(Path.FillType.EVEN_ODD);
 

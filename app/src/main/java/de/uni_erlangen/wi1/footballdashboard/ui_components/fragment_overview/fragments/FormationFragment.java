@@ -2,6 +2,7 @@ package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fr
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ public class FormationFragment extends Fragment
         ReferenceHolder<Integer> clickStateHolder = new ReferenceHolder<>(1);
         // Setup onClick listener
         FrameLayout overLayout = (FrameLayout) root.findViewById(R.id.frame);
+        Log.d("FORMATION_FRAG", "OVerviewlayout:" + overLayout);
 
         for (final PlayerView pView : playerViews) {
             // Set all the same references for each player in the team

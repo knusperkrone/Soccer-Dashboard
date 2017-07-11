@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     private static boolean singleTon = false;
 
     private final FragmentManager fm = getSupportFragmentManager();
-    private final GameGovernor governor = GameGovernor.getInstance();
     private DrawerLayout drawer;
     private Timer timer;
 
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         else
             timer.cancel();
 
-        StatusBar.initInstance(new Handler(), governor.getLatestEventTime(),
+        StatusBar.initInstance(new Handler(),
                 (TextView) findViewById(R.id.statusbar_time),
                 (TextView) findViewById(R.id.statusbar_goal),
                 (TextView) findViewById(R.id.statusbar_team));

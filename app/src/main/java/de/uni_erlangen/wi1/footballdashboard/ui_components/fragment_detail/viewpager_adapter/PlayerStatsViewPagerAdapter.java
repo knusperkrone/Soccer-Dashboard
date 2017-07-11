@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.FragmentPieExample;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.IPlayerFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.LineChartFragment;
@@ -21,11 +22,13 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
     private FragmentManager fm;
     private IPlayerFragment currFragment;
     private OPTA_Player player;
+    private OPTA_Team team;
 
-    public PlayerStatsViewPagerAdapter(FragmentManager fm, OPTA_Player player)
+    public PlayerStatsViewPagerAdapter(FragmentManager fm, OPTA_Team team, OPTA_Player player)
     {
         super(fm);
         this.fm = fm;
+        this.team = team;
         this.player = player;
     }
 
@@ -48,7 +51,7 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
             case 0:
                 return PlayerHeatmapFragment.newInstance(player);
             case 1:
-                return LineChartFragment.newInstance(player);
+                return LineChartFragment.newInstance(team, player);
             case 2:
                 return FragmentPieExample.newInstance();
         }

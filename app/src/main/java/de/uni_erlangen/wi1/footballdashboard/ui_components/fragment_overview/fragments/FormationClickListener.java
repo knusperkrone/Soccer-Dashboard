@@ -1,6 +1,7 @@
 package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fragments;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -36,7 +37,7 @@ class FormationClickListener implements View.OnClickListener, OnSeekBarChangeAbl
 
 
     FormationClickListener(OPTA_Team team, PlayerView pView, PlayerView[] playerViews,
-                           Activity activity, HeatMap heatMap, FrameLayout parentLayout,
+                           Activity activity, HeatMap heatMap, @NonNull FrameLayout parentLayout,
                            ReferenceHolder<View> teamArrowView,
                            ReferenceHolder<Integer> teamClickState,
                            ReferenceHolder<FormationClickListener> clickedListener)
@@ -124,7 +125,10 @@ class FormationClickListener implements View.OnClickListener, OnSeekBarChangeAbl
     {
         heatMap.clearData();
         heatMap.forceRefresh();
-        parentLayout.removeView(teamArrowView.val);
+        if (teamArrowView.val != null) {
+            parentLayout.removeView(teamArrowView.val);
+            teamArrowView.val = null;
+        }
     }
 
     private void state0()

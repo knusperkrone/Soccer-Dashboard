@@ -17,6 +17,10 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 public class HeatMapHelper
 {
 
+    private static final double DEFAULT_POINT_VAL = 40;
+    private static final double MIDDLE_POINT_VAL = 30;
+    private static final double SMALL_POINT_VAL = 25;
+
     public static void setupHeatMap(@NonNull HeatMap heatMap)
     {
         heatMap.setMinimum(10.0);
@@ -39,6 +43,13 @@ public class HeatMapHelper
     public static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
                                               boolean homeTeam, int startTime, int endTime)
     {
+        addDataPointsToHeatmap(player, heatMap, homeTeam, startTime, endTime,
+                evaluatePointValue(startTime, endTime));
+    }
+
+    public static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
+                                              boolean homeTeam, int startTime, int endTime, double val)
+    {
         for (OPTA_Event info : player.getActions()) {
             if (info.getCRTime() < startTime)
                 continue; // Not quite there yet
@@ -59,9 +70,19 @@ public class HeatMapHelper
             if (y > 0.8) y -= 0.1f;
             else if (y < 0.2) y += 0.1f;
 
-            HeatMap.DataPoint point = new HeatMap.DataPoint(x, y, 40.0);
+            HeatMap.DataPoint point = new HeatMap.DataPoint(x, y, val);
             heatMap.addData(point);
         }
+    }
+
+    public static double evaluatePointValue(int startTime, int endTime)
+    {
+        if (endTime - startTime < 40 * 60)
+            return HeatMapHelper.DEFAULT_POINT_VAL;
+        else if (endTime - startTime < 70 * 60)
+            return HeatMapHelper.MIDDLE_POINT_VAL;
+        else
+            return HeatMapHelper.SMALL_POINT_VAL;
     }
 
 

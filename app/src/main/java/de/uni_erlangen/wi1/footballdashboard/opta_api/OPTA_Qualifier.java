@@ -1,7 +1,5 @@
 package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
-import android.util.Log;
-
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Hand;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Attempt;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Goal;
@@ -56,7 +54,7 @@ public abstract class OPTA_Qualifier
             default:
         }
         if (qualifier == null) {
-            Log.d("OPTA_QUALIFIER", "No newInstance() case for: " + id);
+            //Log.d("OPTA_QUALIFIER", "No newInstance() case for: " + id);
             qualifier = new Overrun(value);
         }
         return qualifier;

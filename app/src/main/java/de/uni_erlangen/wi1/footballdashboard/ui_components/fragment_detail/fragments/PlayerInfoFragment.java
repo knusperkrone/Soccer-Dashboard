@@ -19,6 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.custom_views.TabIconView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter.PlayerStatsViewPagerAdapter;
@@ -33,7 +34,7 @@ public class PlayerInfoFragment extends Fragment
 {
 
     private OPTA_Player player;
-    private int teamId;
+    private OPTA_Team team;
 
     private PlayerStatsViewPagerAdapter playerStatsAdapter;
     private RecyclerView playerLiveList;
@@ -41,10 +42,10 @@ public class PlayerInfoFragment extends Fragment
     private CircleImageView image;
     boolean init = false;
 
-    public static Fragment newInstance(OPTA_Player player, int teamId)
+    public static Fragment newInstance(OPTA_Team team, OPTA_Player player)
     {
         PlayerInfoFragment frag = new PlayerInfoFragment();
-        frag.setValues(player, teamId);
+        frag.setValues(team, player);
         return frag;
     }
 
@@ -53,10 +54,10 @@ public class PlayerInfoFragment extends Fragment
         playerStatsAdapter.refreshActiveItem();
     }
 
-    public void setValues(OPTA_Player player, int teamId)
+    public void setValues(OPTA_Team team, OPTA_Player player)
     {
         this.player = player;
-        this.teamId = teamId;
+        this.team = team;
         if (init) // onCreateView() already setted up everything
             initPlayerData();
     }
@@ -91,7 +92,7 @@ public class PlayerInfoFragment extends Fragment
         }
         // Create a liveListAdapter, with parsed data as base
         LiveTeamListAdapter adapter = new LiveTeamListAdapter(passedPlayerActions, getContext(),
-                teamId, playerLiveList, new ILiveFilter()
+                team.getId(), playerLiveList, new ILiveFilter()
         {
             @Override
             public boolean isValid(OPTA_Event event)
@@ -132,7 +133,8 @@ public class PlayerInfoFragment extends Fragment
         // Setup static viewPager
         TabLayout mTabLayout = (TabLayout) root.findViewById(R.id.details_player_tab);
         ViewPager statisticPager = (ViewPager) root.findViewById(R.id.details_player_viewpager);
-        playerStatsAdapter = new PlayerStatsViewPagerAdapter(getFragmentManager(), player);
+
+        playerStatsAdapter = new PlayerStatsViewPagerAdapter(getFragmentManager(), team, player);
         statisticPager.setAdapter(playerStatsAdapter);
         mTabLayout.setupWithViewPager(statisticPager);
 

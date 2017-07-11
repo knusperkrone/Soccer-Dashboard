@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_QUALIFIER_IDS;
@@ -17,6 +18,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Pass;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 
 /**
  * Created by knukro on 6/16/17.
@@ -26,28 +28,29 @@ class DbGameHelper extends SQLiteOpenHelper
 {
 
     private final String DB_PATH;
+    final String gameID;
     private SQLiteDatabase mDatabase;
 
     private TimeList cachedHomeEvents;
     private TimeList cachedAwayEvents;
 
-    DbGameHelper(Context context, String name)
+    DbGameHelper(Context context, String gameID, int homeTeamID)
     {
-        super(context, name, null, 1);
-
-        DB_PATH = context.getDatabasePath(name).getPath();
+        super(context, gameID, null, 1);
+        this.gameID = gameID;
+        this.DB_PATH = context.getDatabasePath(gameID).getPath();
         // Copy Database if necessary
         if (!new File(DB_PATH).exists()) {
             getReadableDatabase(); // Somehow necessary
             Log.d("[DB_META]", "Database does not exist yet");
-            if (DatabaseAdapter.copyDatabase(context, DB_PATH, name))
+            if (DatabaseAdapter.copyDatabase(context, DB_PATH, gameID))
                 Toast.makeText(context, "[GAME] Database inited!", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(context, "[GAME] Database initing failed!", Toast.LENGTH_SHORT).show();
         }
 
         // Cache all data!
-        cacheData();
+        cacheData(homeTeamID);
     }
 
     private void openDatabase()
@@ -62,19 +65,19 @@ class DbGameHelper extends SQLiteOpenHelper
             mDatabase.close();
     }
 
-    private void cacheData()
+    private void cacheData(int homeTeamID)
     {
         openDatabase();
 
         // make a query and save return tuple
-        List<OPTA_Event>[] periodData = cacheQuery();
+        List<OPTA_Event>[] periodData = cacheQuery(homeTeamID);
         cachedHomeEvents = new TimeList(periodData[0]);
         cachedAwayEvents = new TimeList(periodData[1]);
 
         closeDatabase();
     }
 
-    private List<OPTA_Event>[] cacheQuery()
+    private List<OPTA_Event>[] cacheQuery(int homeId)
     {
         final String query = "SELECT id_event, typ_Id, outcome, min, sec, id_player, id_team, x_coord, y_cood, value, qualifier_id, period " +
                 " FROM EventData " +
@@ -95,7 +98,6 @@ class DbGameHelper extends SQLiteOpenHelper
         List<OPTA_Event> awayList = new ArrayList<>(cursor.getCount() / 2);
 
         // Values for easy filtering
-        int homeId = GameGovernor.getInstance().getHomeTeamId();
         OPTA_Event oldHomeEvent = null;
         OPTA_Event oldAwayEvent = null;
 
@@ -128,25 +130,14 @@ class DbGameHelper extends SQLiteOpenHelper
                 cursor.moveToNext();
             } while (!cursor.isAfterLast() && cursor.getInt(0) == eventId);
 
-
             if (homeId == teamId) { // HomeTeam
-
-                // Check if the oldEvent, equals the currEvent to filter duplicates
-                if (oldHomeEvent == null || currEvent instanceof Pass
-                        || (oldHomeEvent.getID() != currEvent.getID()
-                        && oldHomeEvent.getPlayerId() != currEvent.getPlayerId())) {
-
+                if (isNoDuplicate(oldHomeEvent, currEvent)) {
                     // Add to list and set new oldEvent
                     homeList.add(currEvent);
                     oldHomeEvent = currEvent;
                 }
             } else { // AwayTeam
-
-                // Check if the oldEvent, equals the currEvent to filter duplicates
-                if (oldAwayEvent == null || currEvent instanceof Pass
-                        || (oldAwayEvent.getID() != currEvent.getID()
-                        && oldAwayEvent.getPlayerId() != currEvent.getPlayerId())) {
-
+                if (isNoDuplicate(oldAwayEvent, currEvent)) {
                     // Add to list and set new oldEvent
                     awayList.add(currEvent);
                     oldAwayEvent = currEvent;
@@ -158,8 +149,14 @@ class DbGameHelper extends SQLiteOpenHelper
         return new List[]{homeList, awayList}; // Return list tuple
     }
 
+    private static boolean isNoDuplicate(OPTA_Event oldEvent, OPTA_Event currEvent)
+    { // Check if the oldEvent, equals the currEvent to filter duplicates
+        return oldEvent == null || currEvent instanceof Pass
+                || (oldEvent.getID() != currEvent.getID()
+                && oldEvent.playerId != currEvent.playerId);
+    }
 
-    void getPlayerData(GameGovernor.GameGovernorData data, boolean home)
+    void getPlayerData(OPTA_Team team)
     {
         // Only Parse data for period 16 -> Pregame
         final String query = "SELECT qualifier_id, value, ID_team " +
@@ -171,8 +168,8 @@ class DbGameHelper extends SQLiteOpenHelper
                 " ORDER BY Qualifier_ID";
 
         // Choose the right team references form @data
-        SparseArray<OPTA_Player> players = (home) ? data.homeTeam.getPlayers() : data.awayTeam.getPlayers();
-        int teamId = (home) ? data.homeTeam.getId() : data.awayTeam.getId();
+        SparseArray<OPTA_Player> players = team.getPlayers();
+        int teamId = team.getId();
 
         // Make the query
         openDatabase();
@@ -200,12 +197,7 @@ class DbGameHelper extends SQLiteOpenHelper
 
                 case API_QUALIFIER_IDS.TEAM_FORMATION:
                     // Get the team formation/layout value
-                    if (home)
-                        data.homeLayout = Integer.valueOf(cursor.getString(1));
-                    else
-                        data.awayLayout = Integer.valueOf(cursor.getString(1));
-                    break;
-
+                    team.layout = Integer.valueOf(cursor.getString(1));
                 case API_QUALIFIER_IDS.JERSEY_NUMBER:
                     // Parse shirtNumber for every Player
                     String[] shirtNumbers = cursor.getString(1).split(", ");
@@ -241,16 +233,32 @@ class DbGameHelper extends SQLiteOpenHelper
         return (homeTeam) ? cachedHomeEvents.dataList : cachedAwayEvents.dataList;
     }
 
-    void mapPlayerEvents(SparseArray<OPTA_Player> players, boolean homeTeam)
+    void mapPlayerEvents(OPTA_Team team)
     {
         // Maps every event to the right player
         // Choose right list
-        TimeList list = (homeTeam) ? cachedHomeEvents : cachedAwayEvents;
+        SparseArray<OPTA_Player> players = team.getPlayers();
+        TimeList list = (team.isHomeTeam()) ? cachedHomeEvents : cachedAwayEvents;
+
         for (OPTA_Event info : list.dataList) {
             OPTA_Player OPTAPlayer = players.get(info.playerId);
             if (OPTAPlayer != null)
                 OPTAPlayer.actions.add(info);
         }
+    }
+
+    public List<OPTA_Event> getGetPlayerData(OPTA_Player player, boolean homeTeam)
+    {
+        List<OPTA_Event> cachedList = (homeTeam) ?
+                cachedHomeEvents.dataList : cachedAwayEvents.dataList;
+        List<OPTA_Event> outList = new LinkedList<>();
+
+        final int playerID = player.getId();
+        for (OPTA_Event currEvent : cachedList) {
+            if (currEvent.playerId == playerID)
+                outList.add(currEvent);
+        }
+        return outList;
     }
 
     List<OPTA_Event> getNewHomeValues(int endTime)
