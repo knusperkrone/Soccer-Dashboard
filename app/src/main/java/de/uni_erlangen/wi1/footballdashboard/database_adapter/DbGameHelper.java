@@ -196,7 +196,7 @@ class DbGameHelper extends SQLiteOpenHelper
                     break;
 
                 case API_QUALIFIER_IDS.TEAM_FORMATION:
-                    // Get the team formation/layout value
+                    // Get the team layoutPosition/layout value
                     team.layout = Integer.valueOf(cursor.getString(1));
                 case API_QUALIFIER_IDS.JERSEY_NUMBER:
                     // Parse shirtNumber for every Player
@@ -206,7 +206,7 @@ class DbGameHelper extends SQLiteOpenHelper
                     break;
 
                 case API_QUALIFIER_IDS.TEAM_PLAYER_FORMATION:
-                    // Parse player position in formation for every Player
+                    // Parse player position in layoutPosition for every Player
                     String[] layoutPos = cursor.getString(1).split(", ");
                     for (int i = 0; i < layoutPos.length; i++)
                         players.get(Integer.valueOf(playerIds[i])).setLayoutPosition(layoutPos[i]);

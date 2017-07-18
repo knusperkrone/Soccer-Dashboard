@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.live_list;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.main_list;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,12 +12,14 @@ import com.bignerdranch.expandablerecyclerview.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.EventParser;
 
 /**
  * Created by knukro on 6/16/17.
@@ -28,16 +30,15 @@ public class LiveTeamListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, O
 
     private final LayoutInflater inflater;
     private final RecyclerView parent;
-    private final ILiveFilter filter;
-    private final int teamId;
+    private ILiveFilter filter;
+    private int teamId;
 
-    public LiveTeamListAdapter(@NonNull List<OPTA_Event> parentList, Context context, int teamId,
-                               RecyclerView parent, @NonNull ILiveFilter filter)
+    private EventParser parser;
+
+    LiveTeamListAdapter(@NonNull Context context, RecyclerView parent)
     {
-        super(parentList);
-        this.teamId = teamId;
+        super(new LinkedList<OPTA_Event>());
         this.parent = parent;
-        this.filter = filter;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -67,10 +68,20 @@ public class LiveTeamListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, O
         viewHolderQualifier.text.setText(qualifier.getValue());
     }
 
+    void teamChanged(ILiveFilter filter, int teamId, int fromSec, int toSec)
+    {
+        this.filter = filter;
+        this.teamId = teamId;
+        refreshList(fromSec, toSec);
+    }
+
     public void prePendEventInfo(OPTA_Event info)
     {
         if (filter != null && !filter.isValid(info))
             return;
+
+        if (parser != null)
+            parser.addActiveEvent(info);
 
         int scrollOffset = parent.computeVerticalScrollOffset();
         getParentList().add(0, info); // Insert in list
@@ -84,9 +95,15 @@ public class LiveTeamListAdapter extends ExpandableRecyclerAdapter<OPTA_Event, O
     {
         List<OPTA_Event> refreshed =
                 DatabaseAdapter.getInstance().getLiveListData(teamId, fromSec, toSec);
+
+        if (parser != null)
+            parser.setActiveEvents(refreshed);
+
         setParentList(refreshed, false);
         notifyDataSetChanged();
+        parent.scrollToPosition(0);
     }
+
 
     /*ViewHolder!*/
     static class ViewHolderEvent extends ParentViewHolder<OPTA_Event, OPTA_Qualifier>

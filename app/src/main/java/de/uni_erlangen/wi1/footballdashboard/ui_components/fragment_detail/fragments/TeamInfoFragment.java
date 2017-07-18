@@ -12,14 +12,16 @@ import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.custom_views.TabIconView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter.TeamStatsViewPagerAdapter;
 
 /**
  * Created by knukro on 6/18/17.
+ *
  */
 
-public class TeamInfoFragment extends Fragment
+public class TeamInfoFragment extends Fragment implements ActiveView
 {
 
     private OPTA_Team team;
@@ -39,10 +41,17 @@ public class TeamInfoFragment extends Fragment
             teamAdapter.changeTeam(team);
     }
 
-    public void refreshStatistics()
+    @Override
+    public void setActive()
     {
         if (teamAdapter != null)
-            teamAdapter.refreshActiveItem();
+            teamAdapter.setShownFragActive();
+    }
+
+    @Override
+    public void setInactive()
+    {
+        // Nothing to un-register here!
     }
 
     @Nullable

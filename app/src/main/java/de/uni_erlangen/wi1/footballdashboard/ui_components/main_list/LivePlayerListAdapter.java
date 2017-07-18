@@ -1,4 +1,4 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.live_list;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.main_list;
 
 
 import android.annotation.SuppressLint;

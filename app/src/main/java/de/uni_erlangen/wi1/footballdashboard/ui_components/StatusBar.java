@@ -1,15 +1,18 @@
 package de.uni_erlangen.wi1.footballdashboard.ui_components;
 
 import android.os.Handler;
+import android.support.annotation.ColorRes;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.OnSeekBarChangeAble;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.RangeBarOnClickListener;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.OnSeekBarChangeAble;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.RangeBarOnClickListener;
 
 
 public class StatusBar
@@ -29,10 +32,11 @@ public class StatusBar
     private boolean showingHome;
     public int shownTeamId = -1;
 
-    private LiveTeamListAdapter liveTeamListAdapter;
     private RangeSeekBar<Integer> rangeBar;
 
-    private OnSeekBarChangeAble clickedView;
+    private LiveTeamListAdapter liveTeamListAdapter;
+    private OnSeekBarChangeAble liveSeekerChangeable;
+    private ColorRes res;
 
     private StatusBar(Handler refreshHandler, TextView timeLabel, TextView goalLabel,
                       TextView teamLabel)
@@ -43,6 +47,7 @@ public class StatusBar
         this.goalLabel = goalLabel;
         this.maxPeriodTime = GameGovernor.getInstance().getLatestEventTime();
         teamSwitched(0);
+
 
         currentRange = new int[2];
         rangeListener = new RangeBarOnClickListener(this);
@@ -77,9 +82,34 @@ public class StatusBar
     {
         this.rangeBar = rangeBar;
         rangeBar.setRangeValues(0, maxPeriodTime);
-        rangeBar.setOnRangeSeekBarChangeListener(rangeListener);
         rangeBar.setSelectedMaxValue(0);
         rangeBar.setSelectedMinValue(0);
+
+        rangeBar.setTextAboveThumbsColorResource(android.R.color.tab_indicator_text);
+        rangeBar.setOnRangeSeekBarChangeListener(rangeListener);
+        rangeBar.setOnTouchListener(new View.OnTouchListener()
+        { // Stop clock while dragging
+
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent)
+            {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    startDrag();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    stopDrag();
+                }
+                return false;
+            }
+        });
+    }
+
+    public void refreshTimeView()
+    {
+        timeLabel.setText(timeHR(currentRange[1]));
+        if (liveSeekerChangeable != null)
+            liveSeekerChangeable.seekBarChanged(currentRange[0], currentRange[1]);
+        if (liveTeamListAdapter != null)
+            dbAdapter.updateLiveList(liveTeamListAdapter, currentRange[1]);
     }
 
     public void setLiveTeamListAdapter(LiveTeamListAdapter adapter)
@@ -88,21 +118,27 @@ public class StatusBar
         rangeListener.setLiveListAdapter(adapter);
     }
 
-    public void refreshTimeView()
+    public void unregisterLiveTeamAdaper(LiveTeamListAdapter adapter)
     {
-        timeLabel.setText(timeHR(currentRange[1]));
-        if (clickedView != null)
-            clickedView.seekBarChanged(currentRange[0], currentRange[1]);
+
     }
 
     public void registerOnClicked(OnSeekBarChangeAble clickedView)
     {
-        this.clickedView = clickedView;
+        this.liveSeekerChangeable = clickedView;
     }
 
     public void unRegisterOnClicked(OnSeekBarChangeAble clickedView)
     {
-        this.clickedView = null;
+        this.liveSeekerChangeable = null;
+    }
+
+    public void addGoal(boolean homeTeam)
+    {
+        String[] currGoals = goalLabel.getText().toString().split(":");
+        int changedGoal = (homeTeam) ? 0 : 1;
+        currGoals[changedGoal] = "" + Integer.valueOf(currGoals[changedGoal]) + 1;
+        goalLabel.setText(currGoals[0] + " : " + currGoals[1]);
     }
 
     public int getMinRange()
@@ -145,27 +181,39 @@ public class StatusBar
         }
     }
 
+    private void startDrag()
+    {
+        clock.dragged = true;
+    }
+
+    private void stopDrag()
+    {
+        clock.dragged = false;
+    }
+
     private class Clock implements Runnable
     {
         private boolean stopped = false;
+        private boolean dragged = false;
 
         @Override
         public void run()
         {
-            if (stopped || currentRange[1] > maxPeriodTime) {
+            if (stopped || dragged || currentRange[1] > maxPeriodTime) { // Nothing to do here!
                 refreshHandler.postDelayed(this, 1000);
                 return;
             }
 
-            currentRange[1]++; // Time forward
+            currentRange[1] += 10; // Time forward
 
             if (showingHome)
                 governor.getHomeTeam().updateLightColors(currentRange[1]);
             else
                 governor.getAwayTeam().updateLightColors(currentRange[1]);
 
-            dbAdapter.updateLiveList(liveTeamListAdapter, currentRange[1]);
+            // Set new time to rangeBar
             rangeBar.setSelectedMaxValue(currentRange[1]);
+            // Update time-View and registered listeners
             refreshTimeView();
 
             refreshHandler.postDelayed(this, 1000);

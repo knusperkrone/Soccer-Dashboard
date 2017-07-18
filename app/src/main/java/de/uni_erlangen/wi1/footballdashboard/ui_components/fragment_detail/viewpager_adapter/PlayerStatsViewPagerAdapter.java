@@ -14,12 +14,12 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragm
 
 /**
  * Created by knukro on 6/20/17.
+ *
  */
 
 public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
 {
 
-    private FragmentManager fm;
     private IPlayerFragment currFragment;
     private OPTA_Player player;
     private OPTA_Team team;
@@ -27,7 +27,6 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
     public PlayerStatsViewPagerAdapter(FragmentManager fm, OPTA_Team team, OPTA_Player player)
     {
         super(fm);
-        this.fm = fm;
         this.team = team;
         this.player = player;
     }
@@ -36,12 +35,12 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
     {
         this.player = player;
         currFragment.setNewPlayer(player);
-        currFragment.drawStatistics();
+        currFragment.setActive();
     }
 
     public void refreshActiveItem()
     {
-        currFragment.drawStatistics();
+        currFragment.setActive();
     }
 
     @Override
@@ -61,9 +60,13 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object)
     {
+        if (currFragment != null) {
+            currFragment.setInactive();
+        }
         if (currFragment != object) {
             currFragment = ((IPlayerFragment) object);
         }
+        currFragment.setActive();
         super.setPrimaryItem(container, position, object);
     }
 

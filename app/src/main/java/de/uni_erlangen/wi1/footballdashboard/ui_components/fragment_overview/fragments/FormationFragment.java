@@ -2,7 +2,6 @@ package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fr
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +12,19 @@ import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
 import de.uni_erlangen.wi1.footballdashboard.helper.HeatMapHelper;
 import de.uni_erlangen.wi1.footballdashboard.helper.ReferenceHolder;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.ILiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView;
 
 
-public class FormationFragment extends Fragment
+public class FormationFragment extends Fragment implements ActiveView
 {
 
     private final PlayerView[] playerViews;
+    private MainListView mainListView;
     private OPTA_Team team;
     private int layoutId;
 
@@ -31,23 +35,17 @@ public class FormationFragment extends Fragment
         playerViews = new PlayerView[11];
     }
 
-    public static FormationFragment newInstance(int layoutId, boolean homeTeam)
+    public static FormationFragment newInstance(int layoutId, MainListView mainListView, boolean homeTeam)
     {
         FormationFragment frag = new FormationFragment();
         // Set necessary data
         GameGovernor gov = GameGovernor.getInstance();
+        frag.mainListView = mainListView;
         frag.team = (homeTeam) ? gov.getHomeTeam() : gov.getAwayTeam();
         frag.layoutId = layoutId;
 
         return frag;
     }
-
-    public void clearViewOverlays()
-    {
-        if (clickedListener.val != null)
-            clickedListener.val.reset();
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,9 +78,7 @@ public class FormationFragment extends Fragment
         ReferenceHolder<View> viewHolder = new ReferenceHolder<>();
         ReferenceHolder<Integer> clickStateHolder = new ReferenceHolder<>(1);
         // Setup onClick listener
-        FrameLayout overLayout = (FrameLayout) root.findViewById(R.id.frame);
-        Log.d("FORMATION_FRAG", "OVerviewlayout:" + overLayout);
-
+        FrameLayout overLayout = (FrameLayout) root.findViewById(R.id.playfieldlayout);
         for (final PlayerView pView : playerViews) {
             // Set all the same references for each player in the team
             pView.playerImage.setOnClickListener(
@@ -91,5 +87,28 @@ public class FormationFragment extends Fragment
         }
 
         return root;
+    }
+
+
+    @Override
+    public void setActive()
+    {
+        if (mainListView != null) {
+            mainListView.setOverviewListTeam(team.getId(), new ILiveFilter()
+            {
+                @Override
+                public boolean isValid(OPTA_Event event)
+                {
+                    return event.getTeamId() == team.getId();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void setInactive()
+    {
+        if (clickedListener.val != null)
+            clickedListener.val.reset();
     }
 }

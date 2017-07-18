@@ -12,7 +12,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.cus
 public class OPTA_Player implements Comparable
 {
 
-    enum Position
+    private enum Position
     {
         GOALKEEPER, DEFENDER, MIDFIELDER, STRIKER, SUBSTITUTE
     }
@@ -54,9 +54,9 @@ public class OPTA_Player implements Comparable
         }
     }
 
-    public void setPosition(String position)
+    public void setPosition(int position)
     {
-        switch (Integer.valueOf(position)) {
+        switch (position) {
             case 1:
                 this.position = Position.GOALKEEPER;
                 break;
@@ -73,6 +73,11 @@ public class OPTA_Player implements Comparable
                 this.position = Position.SUBSTITUTE;
                 break;
         }
+    }
+
+    public void setPosition(String position)
+    {
+        setPosition(Integer.valueOf(position));
     }
 
     public void changeRankingPoints(int value)
@@ -102,6 +107,21 @@ public class OPTA_Player implements Comparable
         this.captain = isCaptain;
     }
 
+    void setCardYellow()
+    {
+        cardIndicator = 1;
+    }
+
+    void setCardRed()
+    {
+        cardIndicator = 2;
+    }
+
+    public void removeAllCards()
+    {
+        cardIndicator = 0;
+    }
+
     public boolean hasYellowCard()
     {
         return cardIndicator == 1;
@@ -112,7 +132,7 @@ public class OPTA_Player implements Comparable
         return cardIndicator == 2;
     }
 
-    public boolean isActive()
+    boolean isActive()
     {
         return layoutPosition != 0;
     }
@@ -120,6 +140,26 @@ public class OPTA_Player implements Comparable
     public boolean isCaptain()
     {
         return captain;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    void setShirtNumber(int shirtNumber)
+    {
+        this.shirtNumber = shirtNumber;
+    }
+
+    void setLayoutPosition(int layoutPosition)
+    {
+        this.layoutPosition = layoutPosition;
+    }
+
+    public void setPosition(Position position)
+    {
+        this.position = position;
     }
 
     public int getId()

@@ -643,8 +643,8 @@ public class RangeSeekBar<T extends Number> extends ImageView {
             // give text a bit more space here so it doesn't get cut off
             int offset = PixelUtil.dpToPx(getContext(), TEXT_LATERAL_PADDING_IN_DP);
 
-            String minText = String.valueOf(getSelectedMinValue());
-            String maxText = String.valueOf(getSelectedMaxValue());
+            String minText = timeHR(getSelectedMinValue());
+            String maxText = timeHR(getSelectedMaxValue());
             float minTextWidth = paint.measureText(minText) + offset;
             float maxTextWidth = paint.measureText(maxText) + offset;
 
@@ -662,6 +662,17 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                     paint);
         }
 
+    }
+
+    private String timeHR(T currTime)
+    {
+        int minutes = currTime.intValue() / 60;
+        int seconds = currTime.intValue() % 60;
+
+        if (seconds < 10)
+            return "" + minutes + ":0" + seconds;
+        else
+            return "" + minutes + ":" + seconds;
     }
 
     /**

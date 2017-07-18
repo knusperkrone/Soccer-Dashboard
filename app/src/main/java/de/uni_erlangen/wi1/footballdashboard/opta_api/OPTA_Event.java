@@ -22,6 +22,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Deleted_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Dispossessed;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.End;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Error;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Format_Change;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Foul;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Foul_Throw_In;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Goal;
@@ -164,6 +165,11 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
         return playerId;
     }
 
+    public int getTeamId()
+    {
+        return teamId;
+    }
+
     public boolean isSuccess()
     {
         return outcome;
@@ -245,7 +251,7 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
                 info = new Error(outcome, period_id, min, sec, playerId, teamId, x, y);
                 break;
             case FORMATION_CHANGE:
-                //info = new FORMATION_CHANGE(outcome, period_id, min, sec, playerId, teamId, x, y, value);
+                info = new Format_Change(outcome, period_id, min, sec, playerId, teamId, x, y);
                 break;
             case FOUL:
                 info = new Foul(outcome, period_id, min, sec, playerId, teamId, x, y);

@@ -34,14 +34,16 @@ import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameInfo;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.OnSeekBarChangeAble;
 
 /**
  * Created by knukro on 7/4/17.
  */
 
-public class LineChartFragment extends Fragment implements IPlayerFragment,
-        OnChartGestureListener, OnChartValueSelectedListener
+public class LineChartFragment extends Fragment implements IPlayerFragment, OnSeekBarChangeAble,
+        ActiveView, OnChartGestureListener, OnChartValueSelectedListener
 {
 
     private static final int[] mColors = ColorTemplate.MATERIAL_COLORS;
@@ -49,6 +51,8 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
     private CheckBox[] checkBoxes;
     private OPTA_Player player;
     private OPTA_Team team;
+    private int chartIndex = 0;
+    private List<GameInfo> teamGames;
 
     public static LineChartFragment newInstance(OPTA_Team team, OPTA_Player player)
     {
@@ -103,15 +107,11 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
         leftAxis.setDrawLimitLinesBehindData(true);
 
         mChart.getAxisRight().setEnabled(false);
-
-        initStatisticData(player, "Current Game");
-
         mChart.animateX(1500);
 
-
-        // Init old games
+        // Init old games Checkboxes
         TableLayout ll = (TableLayout) root.findViewById(R.id.checkboxes);
-        List<GameInfo> teamGames = DatabaseAdapter.getInstance().getGamesForTeam(team);
+        teamGames = DatabaseAdapter.getInstance().getGamesForTeam(team);
         checkBoxes = new CheckBox[teamGames.size()];
         int i = 0;
         for (final GameInfo gameInfo : teamGames) {
@@ -134,7 +134,102 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
             ll.addView(cb);
         }
 
+        setActive();
         return root;
+    }
+
+    @Override
+    public void seekBarChanged(int minVal, int maxVal)
+    {
+        LineData data = mChart.getData();
+
+        if (data != null) {
+            ILineDataSet dataSet = data.getDataSetByIndex(0);
+
+            // Check if we extended or reduce values
+            if (maxVal < chartIndex * 10) {
+
+                // Reset all values and redraw selected graphs
+                chartIndex = 0;
+                mChart.clearValues();
+                initStatisticData();
+
+                for (int i = 0; i < checkBoxes.length; i++)
+                    if (checkBoxes[i].isChecked())
+                        addOtherGameStatistic(teamGames.get(i));
+
+            } else {
+
+                // Add points until maxVal
+                while (chartIndex < player.playerRankings.size()) {
+                    if (chartIndex * 10 >= maxVal)
+                        break;
+
+                    dataSet.addEntry(new Entry(chartIndex, 11 - player.playerRankings.get(chartIndex)));
+                    chartIndex++;
+                }
+
+            }
+
+            // Redraw
+            mChart.getData().notifyDataChanged();
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
+        }
+    }
+
+
+    private void initStatisticData()
+    {
+        ArrayList<Entry> values = new ArrayList<>();
+
+        // Add all values (until currTime)
+        int maxTime = StatusBar.getInstance().getMaxRange();
+        for (Object rank : this.player.playerRankings) {
+            values.add(new Entry(chartIndex, 11 - (Short) rank));
+            if (chartIndex * 10 >= maxTime)
+                break;
+            chartIndex++;
+        }
+
+        LineDataSet set1;
+
+        if (mChart.getData() != null &&
+                mChart.getData().getDataSetCount() > 0) {
+
+            set1 = (LineDataSet) mChart.getData().getDataSetByIndex(0);
+            set1.setValues(values);
+            mChart.getData().notifyDataChanged();
+            mChart.notifyDataSetChanged();
+
+        } else {
+            // create a dataset and give it a type
+            set1 = new LineDataSet(values, "Current Game");
+            set1.setDrawIcons(false);
+
+            // set the line to be drawn like this "- - - - - -"
+            set1.enableDashedLine(10f, 5f, 0f);
+            set1.enableDashedHighlightLine(10f, 5f, 0f);
+            set1.setColor(Color.BLACK);
+            set1.setCircleColor(Color.BLACK);
+            set1.setLineWidth(1f);
+            set1.setCircleRadius(3f);
+            set1.setDrawCircleHole(false);
+            set1.setValueTextSize(9f);
+            set1.setDrawFilled(true);
+            set1.setFormLineWidth(1f);
+            set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
+            set1.setFormSize(15.f);
+            set1.setFillColor(Color.BLACK);
+
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1); // add the datasets
+
+            // create a data object with the datasets
+            LineData data = new LineData(dataSets);
+            // set data
+            mChart.setData(data);
+        }
     }
 
 
@@ -176,60 +271,6 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
         }
     }
 
-    private void initStatisticData(OPTA_Player currPlayer, String name)
-    {
-        ArrayList<Entry> values = new ArrayList<>();
-
-        // Add all values (until currTime)
-        int maxTime = StatusBar.getInstance().getMaxRange();
-        int i = 0;
-        for (Object rank : currPlayer.playerRankings) {
-            values.add(new Entry(i, 11 - (Short) rank));
-            if (i * 10 >= maxTime)
-                break;
-            i++;
-        }
-
-        LineDataSet set1;
-
-        if (mChart.getData() != null &&
-                mChart.getData().getDataSetCount() > 0) {
-
-            set1 = (LineDataSet) mChart.getData().getDataSetByIndex(0);
-            set1.setValues(values);
-            mChart.getData().notifyDataChanged();
-            mChart.notifyDataSetChanged();
-
-        } else {
-            // create a dataset and give it a type
-            set1 = new LineDataSet(values, name);
-            set1.setDrawIcons(false);
-
-            // set the line to be drawn like this "- - - - - -"
-            set1.enableDashedLine(10f, 5f, 0f);
-            set1.enableDashedHighlightLine(10f, 5f, 0f);
-            set1.setColor(Color.BLACK);
-            set1.setCircleColor(Color.BLACK);
-            set1.setLineWidth(1f);
-            set1.setCircleRadius(3f);
-            set1.setDrawCircleHole(false);
-            set1.setValueTextSize(9f);
-            set1.setDrawFilled(true);
-            set1.setFormLineWidth(1f);
-            set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
-            set1.setFormSize(15.f);
-            set1.setFillColor(Color.BLACK);
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(set1); // add the datasets
-
-            // create a data object with the datasets
-            LineData data = new LineData(dataSets);
-            // set data
-            mChart.setData(data);
-        }
-    }
-
     private void removeOtherGameStatistic(GameInfo gameInfo)
     {
         LineData data = mChart.getData();
@@ -244,15 +285,25 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
         mChart.invalidate();
     }
 
+
     @Override
-    public void drawStatistics()
+    public void setActive()
     {
-        mChart.clearValues();
-        initStatisticData(player, "Current Game");
+        chartIndex = 0;
+        if (mChart.getData() != null)
+            mChart.clearValues();
+        initStatisticData();
+        StatusBar.getInstance().registerOnClicked(this);
         mChart.getData().notifyDataChanged();
         mChart.notifyDataSetChanged();
         for (CheckBox cb : checkBoxes)
             cb.setChecked(false);
+    }
+
+    @Override
+    public void setInactive()
+    {
+        StatusBar.getInstance().unRegisterOnClicked(this);
     }
 
     @Override
@@ -315,5 +366,4 @@ public class LineChartFragment extends Fragment implements IPlayerFragment,
     public void onNothingSelected()
     {
     }
-
 }

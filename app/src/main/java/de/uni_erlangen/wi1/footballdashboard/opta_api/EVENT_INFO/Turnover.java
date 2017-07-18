@@ -24,7 +24,7 @@ public class Turnover extends OPTA_Event
     @Override
     public String getDescription()
     {
-        return "Event is no longer used";
+        return "Turnover";
     }
 
 }

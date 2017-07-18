@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import de.uni_erlangen.wi1.footballdashboard.helper.TeamFormationChange;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Pass;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
 
@@ -47,7 +48,6 @@ public class OPTA_Team
 
     public void setEvents(@NonNull List<OPTA_Event> events)
     {
-        Log.d("OPTA_TEAM", "Team " + teamName + " received " + events.size() + " events");
         this.events = events;
         evaluateRanking();
     }
@@ -77,6 +77,25 @@ public class OPTA_Team
         return playerRankings.get(index);
     }
 
+    public void resetCards()
+    {
+        //TODO:
+    }
+
+    public void setYellowCard(int playerId)
+    {
+        OPTA_Player player = playerSparseArray.get(playerId);
+        if (player != null)
+            player.setCardYellow();
+    }
+
+    public void setRedCard(int playerId)
+    {
+        OPTA_Player player = playerSparseArray.get(playerId);
+        if (player != null)
+            player.setCardRed();
+    }
+
     public void updateLightColors(int timeInSeconds)
     {
         // Updates the views to their cached ranking @timeInSeconds
@@ -97,6 +116,18 @@ public class OPTA_Team
 
             }
             i++;
+        }
+    }
+
+    public void setNewTeamData(TeamFormationChange[] newPlayerData, int newCaptain)
+    {
+        for (TeamFormationChange currPlayerData : newPlayerData) {
+            OPTA_Player currPlayer = playerSparseArray.get(currPlayerData.playerId);
+            // Set new values
+            currPlayer.setPosition(currPlayerData.position);
+            currPlayer.setShirtNumber(currPlayerData.jerseyNumber);
+            currPlayer.setLayoutPosition(currPlayerData.layoutPosition);
+            currPlayer.setCaptain(currPlayerData.playerId == newCaptain);
         }
     }
 
@@ -262,6 +293,11 @@ public class OPTA_Team
     {
         OPTA_Player tmp = playerSparseArray.get(playerId);
         return (tmp != null) ? tmp.getName() : null;
+    }
+
+    public void setLayout(int layout)
+    {
+        this.layout = layout;
     }
 
     public boolean isHomeTeam()

@@ -4,15 +4,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
+
+import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import java.util.Timer;
 
@@ -20,8 +22,7 @@ import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.MainViewpagerAdapter;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.DetailFragment;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.OverviewFragment;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView;
 import fr.castorflex.android.verticalviewpager.VerticalViewPager;
 
 public class MainActivity extends AppCompatActivity
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity
     private static boolean singleTon = false;
 
     private final FragmentManager fm = getSupportFragmentManager();
+    private MainListView mainListView;
     private DrawerLayout drawer;
     private Timer timer;
 
@@ -48,40 +50,73 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         // Init singletons!
         initDatabase();
-        setupStatusBar();
+        initStatusBar();
         singleTon = true;
+        initMainList();
+        initSeekBar();
+
         // NavigationDrawer
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // ViewPager (Main-Content)
-        final VerticalViewPager mainViewPager = (VerticalViewPager) findViewById(R.id.main_viewpager);
-        final MainViewpagerAdapter adapter = new MainViewpagerAdapter(fm);
-        mainViewPager.setAdapter(adapter);
 
-        // Notify the new-found active fragment, over it's state!
-        mainViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
+        VerticalViewPager mainViewPager = (VerticalViewPager) findViewById(R.id.main_viewpager);
+        MainViewpagerAdapter adapter = new MainViewpagerAdapter(fm, mainListView);
+        mainViewPager.setAdapter(adapter);
+    }
+
+    private void initDatabase()
+    {
+        if (singleTon)
+            return;
+
+        DatabaseAdapter.initInstance(this);
+        //TODO: Parse Settings
+        GameGovernor.getInstance().setGame(this, "838532");
+    }
+
+    private void initStatusBar()
+    {
+        if (singleTon)
+            return;
+
+        if (timer == null)
+            timer = new Timer();
+        else
+            timer.cancel();
+
+        StatusBar.initInstance(new Handler(),
+                (TextView) findViewById(R.id.statusbar_time),
+                (TextView) findViewById(R.id.statusbar_goal),
+                (TextView) findViewById(R.id.statusbar_team));
+        StatusBar.getInstance().startClock();
+    }
+
+    private void initMainList()
+    {
+        mainListView = (MainListView) findViewById(R.id.list_placeholder);
+    }
+
+    private void initSeekBar()
+    {
+        ImageButton seekerButton = (ImageButton) findViewById(R.id.start_button);
+        seekerButton.setOnClickListener(new View.OnClickListener()
         {
+            private boolean clicked = false;
             @Override
-            public void onPageSelected(final int position)
+            public void onClick(View view)
             {
-                runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        Fragment frag = adapter.getFragmentAt(position);
-                        if (frag == null)
-                            return;
-                        if (position == 0)
-                            ((OverviewFragment) frag).setActive();
-                        else
-                            ((DetailFragment) frag).setActive();
-                    }
-                });
+                if (clicked)
+                    StatusBar.getInstance().startClock();
+                else
+                    StatusBar.getInstance().stopClock();
+                clicked = !clicked;
             }
         });
+        RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar) findViewById(R.id.rangeBar);
+        StatusBar.getInstance().setRangeBar(rangeSeekBar);
     }
 
 
@@ -135,31 +170,6 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void initDatabase()
-    {
-        if (singleTon)
-            return;
-        DatabaseAdapter.initInstance(this);
-        GameGovernor.getInstance().setGame(this, "838507");
-    }
-
-    private void setupStatusBar()
-    {
-        if (singleTon)
-            return;
-
-        if (timer == null)
-            timer = new Timer();
-        else
-            timer.cancel();
-
-        StatusBar.initInstance(new Handler(),
-                (TextView) findViewById(R.id.statusbar_time),
-                (TextView) findViewById(R.id.statusbar_goal),
-                (TextView) findViewById(R.id.statusbar_team));
-        StatusBar.getInstance().startClock();
     }
 
 }

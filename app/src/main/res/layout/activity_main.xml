@@ -16,10 +16,35 @@
 
         <include layout="@layout/statusbar"/>
 
-        <fr.castorflex.android.verticalviewpager.VerticalViewPager
-            android:id="@+id/main_viewpager"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent">
+
+            <de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView
+                android:id="@+id/list_placeholder"
+                android:layout_width="@dimen/mainlist_size_large"
+                android:layout_height="match_parent"
+                android:background="@color/bad_perf"/>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <fr.castorflex.android.verticalviewpager.VerticalViewPager
+                    android:id="@+id/main_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/average_perf"/>
+
+                <include
+                    layout="@layout/seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </TableLayout>
+
+        </LinearLayout>
 
     </TableLayout>
 

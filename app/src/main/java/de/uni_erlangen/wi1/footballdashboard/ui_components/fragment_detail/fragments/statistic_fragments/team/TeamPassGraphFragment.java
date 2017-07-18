@@ -26,11 +26,31 @@ public class TeamPassGraphFragment extends Fragment implements ITeamFragment
     private TextView countView;
     private OPTA_Team team;
 
+
     public static Fragment newInstance(OPTA_Team team)
     {
         TeamPassGraphFragment frag = new TeamPassGraphFragment();
         frag.team = team;
         return frag;
+    }
+
+    @Override
+    public void setActive()
+    {
+        int[] passes = countTeamPasses();
+        countView.setText("" + passes[0] + "/" + passes[1]);
+    }
+
+    @Override
+    public void setInactive()
+    {
+
+    }
+
+    @Override
+    public void seekBarChanged(int minVal, int maxVal)
+    {
+        //TODO:
     }
 
     @Nullable
@@ -41,7 +61,7 @@ public class TeamPassGraphFragment extends Fragment implements ITeamFragment
 
         countView = (TextView) root.findViewById(R.id.team_paesse);
 
-        drawStatistics();
+        setActive();
         return root;
     }
 
@@ -50,14 +70,6 @@ public class TeamPassGraphFragment extends Fragment implements ITeamFragment
     {
         this.team = team;
     }
-
-    @Override
-    public void drawStatistics()
-    {
-        int[] passes = countTeamPasses();
-        countView.setText("" + passes[0] + "/" + passes[1]);
-    }
-
 
     private int[] countTeamPasses()
     {

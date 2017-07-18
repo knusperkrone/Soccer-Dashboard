@@ -10,7 +10,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 public class Format_Change extends OPTA_Event
 {
 
-    public Format_Change(boolean outcome, int period_id, int min, int sec, int playerId, int teamId, double x, double y, String value)
+    public Format_Change(boolean outcome, int period_id, int min, int sec, int playerId, int teamId, double x, double y)
     {
         super(outcome, period_id, min, sec, playerId, teamId, x, y);
     }

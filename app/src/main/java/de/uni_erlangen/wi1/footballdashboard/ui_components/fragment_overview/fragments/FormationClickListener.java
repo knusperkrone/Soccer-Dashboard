@@ -11,9 +11,9 @@ import de.uni_erlangen.wi1.footballdashboard.helper.HeatMapHelper;
 import de.uni_erlangen.wi1.footballdashboard.helper.ReferenceHolder;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.OnSeekBarChangeAble;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.ArrowView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.OnSeekBarChangeAble;
 
 
 class FormationClickListener implements View.OnClickListener, OnSeekBarChangeAble

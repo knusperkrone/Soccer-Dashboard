@@ -13,6 +13,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragm
 
 /**
  * Created by knukro on 5/24/17.
+ *
  */
 
 public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
@@ -31,12 +32,13 @@ public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
     {
         this.team = team;
         currFragment.setNewTeam(team);
-        currFragment.drawStatistics();
+        currFragment.setActive();
     }
 
-    public void refreshActiveItem()
+    public void setShownFragActive()
     {
-        currFragment.drawStatistics();
+        if (currFragment != null)
+            currFragment.setActive();
     }
 
     @Override
@@ -56,9 +58,14 @@ public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object)
     {
+        if (currFragment != null) {
+            currFragment.setInactive();
+        }
         if (object != currFragment) {
             currFragment = (ITeamFragment) object;
         }
+        currFragment.setActive();
+        ;
         super.setPrimaryItem(container, position, object);
     }
 

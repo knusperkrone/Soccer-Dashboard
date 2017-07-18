@@ -1,13 +1,14 @@
-package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview;
+package de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar;
 
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
 
 /**
  * Created by knukro on 7/4/17.
+ *
  */
 
 public class RangeBarOnClickListener implements RangeSeekBar.OnRangeSeekBarChangeListener<Integer>
@@ -25,11 +26,12 @@ public class RangeBarOnClickListener implements RangeSeekBar.OnRangeSeekBarChang
     public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue)
     {
         // Set's new bounds and adjusts shown time
-        statusBar.setMaxRange(maxValue);
         statusBar.setMinRange(minValue);
+        statusBar.setMaxRange(maxValue);
         statusBar.refreshTimeView();
         // Adjust the list data
-        liveListAdapter.refreshList(minValue, maxValue);
+        if (liveListAdapter != null)
+            liveListAdapter.refreshList(minValue, maxValue);
     }
 
     public void setLiveListAdapter(LiveTeamListAdapter adapter)

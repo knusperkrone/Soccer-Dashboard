@@ -12,7 +12,7 @@ import java.util.List;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
 
 /**
  * Created by knukro on 6/16/17.

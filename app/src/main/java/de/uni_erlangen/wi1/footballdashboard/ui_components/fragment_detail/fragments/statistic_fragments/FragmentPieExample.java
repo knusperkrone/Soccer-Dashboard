@@ -40,7 +40,13 @@ public class FragmentPieExample extends Fragment implements ITeamFragment, IPlay
     }
 
     @Override
-    public void drawStatistics()
+    public void setActive()
+    {
+
+    }
+
+    @Override
+    public void setInactive()
     {
 
     }
@@ -49,6 +55,12 @@ public class FragmentPieExample extends Fragment implements ITeamFragment, IPlay
     public void setNewTeam(OPTA_Team team)
     {
 
+    }
+
+    @Override
+    public void seekBarChanged(int minVal, int maxVal)
+    {
+        //TODO:
     }
 
     private PieChart mChart;
@@ -200,6 +212,5 @@ public class FragmentPieExample extends Fragment implements ITeamFragment, IPlay
         s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
         return s;
     }
-
 
 }

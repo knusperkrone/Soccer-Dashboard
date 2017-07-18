@@ -40,8 +40,8 @@ public class HeatMapHelper
         heatMap.forceRefresh();
     }
 
-    public static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
-                                              boolean homeTeam, int startTime, int endTime)
+    private static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
+                                               boolean homeTeam, int startTime, int endTime)
     {
         addDataPointsToHeatmap(player, heatMap, homeTeam, startTime, endTime,
                 evaluatePointValue(startTime, endTime));

@@ -20,23 +20,25 @@ import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.custom_views.TabIconView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.viewpager_adapter.PlayerStatsViewPagerAdapter;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.ILiveFilter;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.live_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
 
 /**
- * Created by knukro on 6/18/17.
+ * Created by knukro on 6/18/17
+ * .
  */
 
-public class PlayerInfoFragment extends Fragment
+public class PlayerInfoFragment extends Fragment implements ActiveView
 {
 
     private OPTA_Player player;
     private OPTA_Team team;
 
     private PlayerStatsViewPagerAdapter playerStatsAdapter;
+    LiveTeamListAdapter adapter;
     private RecyclerView playerLiveList;
     private TextView name, position, number;
     private CircleImageView image;
@@ -47,11 +49,6 @@ public class PlayerInfoFragment extends Fragment
         PlayerInfoFragment frag = new PlayerInfoFragment();
         frag.setValues(team, player);
         return frag;
-    }
-
-    public void refreshStatistics()
-    {
-        playerStatsAdapter.refreshActiveItem();
     }
 
     public void setValues(OPTA_Team team, OPTA_Player player)
@@ -78,9 +75,9 @@ public class PlayerInfoFragment extends Fragment
             image.setBorderColor(ContextCompat.getColor(getContext(), R.color.playerinfo_normal));
 
         // Create a list with all passed event's for this Player
-        StatusBar bar = StatusBar.getInstance();
-        int maxTime = bar.getMaxRange();
-        int minTime = bar.getMinRange();
+        StatusBar statusBar = StatusBar.getInstance();
+        int maxTime = statusBar.getMaxRange();
+        int minTime = statusBar.getMinRange();
         LinkedList<OPTA_Event> passedPlayerActions = new LinkedList<>();
 
         for (OPTA_Event event : player.getActions()) {
@@ -90,6 +87,7 @@ public class PlayerInfoFragment extends Fragment
                 break; // That's enough now
             passedPlayerActions.add(0, event);
         }
+        /*
         // Create a liveListAdapter, with parsed data as base
         LiveTeamListAdapter adapter = new LiveTeamListAdapter(passedPlayerActions, getContext(),
                 team.getId(), playerLiveList, new ILiveFilter()
@@ -101,9 +99,10 @@ public class PlayerInfoFragment extends Fragment
 
             }
         });
+        */
         // Set and register LiveListAdapter
         playerLiveList.setAdapter(adapter);
-        bar.setLiveTeamListAdapter(adapter);
+        statusBar.setLiveTeamListAdapter(adapter);
 
         // Also change player for statisticsViewPager
         if (playerStatsAdapter != null)
@@ -144,5 +143,21 @@ public class PlayerInfoFragment extends Fragment
         }
 
         return root;
+    }
+
+    @Override
+    public void setActive()
+    {
+        if (adapter != null) {
+            StatusBar.getInstance().setLiveTeamListAdapter(adapter);
+            playerStatsAdapter.refreshActiveItem();
+        }
+    }
+
+    @Override
+    public void setInactive()
+    {
+        if (adapter != null)
+            StatusBar.getInstance().unregisterLiveTeamAdaper(adapter);
     }
 }

@@ -4,11 +4,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fragments.FormationFragment;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView;
 
 /**
  * Created by knukro on 5/24/17.
@@ -18,38 +21,64 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fra
 public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
 {
 
-    private final int layoutHome, layoutAway;
-    private FormationFragment homeFragment;
-    private FormationFragment awayFragment;
+    private final MainListView mainList;
+    private final StatusBar statusBar;
+    private int layoutHome, layoutAway;
+    private ActiveView currFragment;
 
 
-    public FormatViewPagerAdapter(FragmentManager fm)
+    public FormatViewPagerAdapter(FragmentManager fm, MainListView mainList)
     {
         super(fm);
+        this.mainList = mainList;
+        this.statusBar = StatusBar.getInstance();
         GameGovernor governor = GameGovernor.getInstance();
         this.layoutHome = getHomeLayoutId(governor.getHomeLayout());
         this.layoutAway = getAwayLayoutId(governor.getAwayLayout());
     }
 
+    public void teamChangeFormation(boolean homeTeam, int newFormation)
+    {
+        if (homeTeam)
+            layoutHome = newFormation;
+        else
+            layoutAway = newFormation;
+        // TODO: Check if that works
+        notifyDataSetChanged();
+    }
+
     @Override
     public Fragment getItem(int position)
     {
+        FormationFragment fragment;
         switch (position) {
             case 0:
-                homeFragment = FormationFragment.newInstance(layoutHome, true);
-                return homeFragment;
+                fragment = FormationFragment.newInstance(layoutHome, mainList, true);
+                break;
             case 1:
-                awayFragment = FormationFragment.newInstance(layoutAway, false);
-                return awayFragment;
+                fragment = FormationFragment.newInstance(layoutAway, mainList, false);
+                break;
+            default:
+                throw new IllegalArgumentException("You can't have more than 2 teams playing");
         }
-        throw new IllegalArgumentException("You can't have more than 2 team playing");
+        return fragment;
     }
 
-    public FormationFragment getInactiveFragment()
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object)
     {
-        return StatusBar.getInstance().isShowingHome() ? awayFragment : homeFragment;
-    }
+        if (object != currFragment) {
+            statusBar.teamSwitched(position);
+            if (currFragment != null) {
+                currFragment.setInactive();
+            }
+            currFragment = (ActiveView) object;
+            currFragment.setActive();
+        }
+        super.setPrimaryItem(container, position, object);
 
+
+    }
 
     @Override
     public int getCount()
