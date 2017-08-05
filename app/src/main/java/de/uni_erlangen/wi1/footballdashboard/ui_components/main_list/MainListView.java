@@ -15,6 +15,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 
 /**
  * Created by knukro on 18.07.17.
+ *
  */
 
 public class MainListView extends LinearLayout
@@ -69,7 +70,7 @@ public class MainListView extends LinearLayout
     {
         StatusBar sBar = StatusBar.getInstance();
         overViewListAdapter.teamChanged(filter, teamId, sBar.getMinRange(), sBar.getMaxRange());
-        recyclerView.setAdapter(overViewListAdapter);
+        setAdapter(overViewListAdapter);
     }
 
     public void setLivePlayerListAdapter(FragmentManager fm, OPTA_Team team)
@@ -82,12 +83,13 @@ public class MainListView extends LinearLayout
     public boolean playerAdapterChangedTeam(OPTA_Team team)
     {
         boolean teamChanged = detailFragListAdapter.changedTeam(team);
-        recyclerView.setAdapter(detailFragListAdapter);
+        setAdapter(detailFragListAdapter);
         return teamChanged;
     }
 
     public void setAdapter(RecyclerView.Adapter adapter)
     {
+        //TODO: Nice animation
         recyclerView.setAdapter(adapter);
     }
 

@@ -44,9 +44,8 @@ public class PlayerHeatmapFragment extends Fragment implements IPlayerFragment, 
     @Override
     public void setActive()
     {
+        HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
         StatusBar.getInstance().registerOnClicked(this);
-        if (heatMap != null)
-            HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
     }
 
     @Override
@@ -58,8 +57,10 @@ public class PlayerHeatmapFragment extends Fragment implements IPlayerFragment, 
     @Override
     public void seekBarChanged(int minVal, int maxVal)
     {
-        if (heatMap != null)
-            HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
+        if (heatMap == null)
+            return;
+
+        HeatMapHelper.drawCurrentHeatmap(player, heatMap, homeTeam);
     }
 
     @Nullable

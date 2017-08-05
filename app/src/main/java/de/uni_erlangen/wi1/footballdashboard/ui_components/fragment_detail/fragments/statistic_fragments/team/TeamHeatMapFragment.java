@@ -67,13 +67,15 @@ public class TeamHeatMapFragment extends Fragment implements ITeamFragment, OnSe
     public void seekBarChanged(int minVal, int maxVal)
     {
         // Redraw heatmap and evaluate point transparency
-        heatMap.clearData();
         double pointValue = HeatMapHelper.evaluatePointValue(minVal, maxVal);
-        OPTA_Player[] sortedPlayers = team.getRankedPlayers(StatusBar.getInstance().getMaxRange());
+        OPTA_Player[] sortedPlayers = team.getRankedPlayers(maxVal);
+        heatMap.clearData();
+
         for (OPTA_Player player : sortedPlayers) {
             // TODO: POSITION filter
             HeatMapHelper.addDataPointsToHeatmap(player, heatMap, homeTeam, minVal, maxVal, pointValue);
         }
+
         heatMap.forceRefresh();
     }
 
