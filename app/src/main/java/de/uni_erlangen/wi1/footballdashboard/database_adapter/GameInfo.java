@@ -7,11 +7,11 @@ package de.uni_erlangen.wi1.footballdashboard.database_adapter;
 public class GameInfo
 {
 
-    final String homeTeam;
-    final String awayTeam;
-    final int gameId;
+    private final String homeTeam;
+    private final String awayTeam;
+    private final int gameId;
 
-    public GameInfo(int gameId, String homeTeam, String awayTeam)
+    GameInfo(int gameId, String homeTeam, String awayTeam)
     {
         this.gameId = gameId;
         this.homeTeam = homeTeam;

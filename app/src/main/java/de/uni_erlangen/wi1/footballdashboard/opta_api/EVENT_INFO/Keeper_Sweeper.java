@@ -2,6 +2,7 @@ package de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 
 /**
  * Created by knukro on 5/22/17.
@@ -19,6 +20,14 @@ public class Keeper_Sweeper extends OPTA_Event
     public int getID()
     {
         return API_TYPE_IDS.KEEPER_SWEEPER;
+    }
+
+    @Override
+    public void calcRankingPoint(OPTA_Player player)
+    {
+        int value = (outcome) ? 2 : 0;
+
+        player.changeRankingPoints(value);
     }
 
     @Override

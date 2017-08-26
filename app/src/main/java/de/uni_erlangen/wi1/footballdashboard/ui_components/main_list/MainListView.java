@@ -15,7 +15,6 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 
 /**
  * Created by knukro on 18.07.17.
- *
  */
 
 public class MainListView extends LinearLayout
@@ -23,8 +22,8 @@ public class MainListView extends LinearLayout
 
     private RecyclerView recyclerView;
 
-    private LiveTeamListAdapter overViewListAdapter;
-    private LivePlayerListAdapter detailFragListAdapter;
+    private LiveActionListAdapter overViewListAdapter;
+    private PlayerRankListAdapter detailFragListAdapter;
 
 
     public MainListView(Context context)
@@ -45,7 +44,7 @@ public class MainListView extends LinearLayout
         init();
     }
 
-    public void init()
+    private void init()
     {
         inflate(getContext(), R.layout.main_list_helper, this);
         recyclerView = (RecyclerView) findViewById(R.id.main_list);
@@ -53,30 +52,36 @@ public class MainListView extends LinearLayout
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(50);
 
-        overViewListAdapter = new LiveTeamListAdapter(getContext(), recyclerView);
+        overViewListAdapter = new LiveActionListAdapter(getContext(), recyclerView);
     }
+
 
     public void setActive(int position)
     {
         if (position == 0) {
+
             recyclerView.setAdapter(overViewListAdapter);
-            StatusBar.getInstance().setLiveTeamListAdapter(overViewListAdapter);
+            StatusBar.getInstance().setLiveActionListAdapter(overViewListAdapter);
+
         } else if (detailFragListAdapter != null) {
+
             recyclerView.setAdapter(detailFragListAdapter);
+            StatusBar.getInstance().unregisterLiveActionListAdapter(overViewListAdapter);
+
         }
     }
 
     public void setOverviewListTeam(int teamId, ILiveFilter filter)
     {
         StatusBar sBar = StatusBar.getInstance();
-        overViewListAdapter.teamChanged(filter, teamId, sBar.getMinRange(), sBar.getMaxRange());
+        overViewListAdapter.valuesChanged(filter, teamId, sBar.getMinRange(), sBar.getMaxRange());
         setAdapter(overViewListAdapter);
     }
 
     public void setLivePlayerListAdapter(FragmentManager fm, OPTA_Team team)
     {
         if (detailFragListAdapter == null)
-            detailFragListAdapter = new LivePlayerListAdapter(fm, getContext(), team);
+            detailFragListAdapter = new PlayerRankListAdapter(fm, getContext(), team);
         setAdapter(detailFragListAdapter);
     }
 
@@ -87,9 +92,8 @@ public class MainListView extends LinearLayout
         return teamChanged;
     }
 
-    public void setAdapter(RecyclerView.Adapter adapter)
+    private void setAdapter(RecyclerView.Adapter adapter)
     {
-        //TODO: Nice animation
         recyclerView.setAdapter(adapter);
     }
 

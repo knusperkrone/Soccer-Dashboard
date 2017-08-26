@@ -16,6 +16,11 @@
     <color name="bad_perf">#75ff6434</color>
     <color name="worst_perf">#dd2c00</color>
 
+    <color name="sub_border">#858585</color>
+    <color name="good_border">#00e676</color>
+    <color name="medium_border">#F1D600</color>
+    <color name="bad_border">#dd2c00</color>
+
     <color name="playerinfo_normal">#E8E8E8</color>
     <color name="playerinfo_yellow">#FFEE00</color>
     <color name="playerinfo_red">#FF2222</color>

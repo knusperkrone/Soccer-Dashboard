@@ -18,6 +18,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Clearance;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Collection_End;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Condition_Change;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Cross_Not_Claimed;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Default_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Deleted_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Dispossessed;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.End;
@@ -119,26 +120,28 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
 
     public final List<OPTA_Qualifier> qualifiers = new ArrayList<>(11);
 
-    public final boolean outcome;
-    public final int period_id;
-    public final int min;
-    public final int sec;
-    public final int playerId;
-    public final int teamId;
-    public final double x;
-    public final double y;
+    protected final boolean outcome;
+    protected final int period_id;
+    protected final int playerId;
+    protected final int teamId;
+    protected final double x;
+    protected final double y;
 
-    public OPTA_Event(boolean outcome, int period_id, int min, int sec, int playerId,
-                      int teamId, double x, double y)
+    private final int timeCR;
+    private final String timeHR;
+
+    protected OPTA_Event(boolean outcome, int period_id, int min, int sec, int playerId,
+                         int teamId, double x, double y)
     {
         this.outcome = outcome;
         this.period_id = period_id;
-        this.min = min;
-        this.sec = sec;
         this.playerId = playerId;
         this.teamId = teamId;
         this.x = x;
         this.y = y;
+
+        this.timeCR = min * 60 + sec;
+        this.timeHR = ((min < 10) ? "0" : "") + min + ":" + ((sec < 10) ? "0" : "") + sec;
     }
 
     @Override
@@ -153,9 +156,21 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
         return false;
     }
 
+    public boolean hasQualifier(int... searchedQualifierIds)
+    {
+        // TODO: Reduce O(n)² with HashMap
+        for (int searchQualifierId : searchedQualifierIds) {
+            for (OPTA_Qualifier qualifier : qualifiers) {
+                if (qualifier.getId() == searchQualifierId)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public void calcRankingPoint(OPTA_Player player)
     {
-        ;
+
     }
 
     public abstract int getID();
@@ -182,12 +197,22 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
 
     public int getCRTime()
     {
-        return min * 60 + sec;
+        return timeCR;
     }
 
     public String getHRTime()
     {
-        return ((min < 10) ? "0" : "") + min + ":" + ((sec < 10) ? "0" : "") + sec;
+        return timeHR;
+    }
+
+    public double getX()
+    {
+        return x;
+    }
+
+    public double getY()
+    {
+        return y;
     }
 
     public static OPTA_Event newInstance(int ID, boolean outcome, int period_id,
@@ -371,10 +396,9 @@ public abstract class OPTA_Event implements Parent<OPTA_Qualifier>
                 info = new Turnover(outcome, period_id, min, sec, playerId, teamId, x, y);
                 break;
         }
-        if (info == null) {
-            //FIXME: Log.d("[OPTA_EVENTINFO]", "New Instace got null for :" + ID);
-            info = new Turnover(outcome, period_id, min, sec, playerId, teamId, x, y);
-        }
+        if (info == null)
+            info = new Default_Event(outcome, period_id, min, sec, playerId, teamId, x, y, ID);
+
         return info;
     }
 

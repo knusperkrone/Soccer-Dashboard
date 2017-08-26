@@ -12,12 +12,15 @@ import java.util.List;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.ILiveFilter;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveActionListAdapter;
 
 /**
- * Created by knukro on 6/16/17.
+ * Created by knukro on 6/16/17
+ * .
  */
 
+@SuppressWarnings("unchecked")
 public class DatabaseAdapter
 {
 
@@ -47,7 +50,7 @@ public class DatabaseAdapter
         return instance;
     }
 
-    public void updateLiveList(LiveTeamListAdapter listAdapter, int endTime)
+    public void updateLiveList(LiveActionListAdapter listAdapter, int endTime)
     {
         // Just update new data
         List<OPTA_Event> newValues;
@@ -61,15 +64,16 @@ public class DatabaseAdapter
             listAdapter.prePendEventInfo(newValues.get(i));
     }
 
-    public List<OPTA_Event> getLiveListData(int teamId, int startTime, int endTime)
+    public List<OPTA_Event> getLiveListData(int teamId, ILiveFilter filter, int startTime, int endTime)
     {
-        // Get a whole bunch of data
+        // Return the whole list
         List<OPTA_Event> wrongOrder;
         if (teamId == GameGovernor.getInstance().getHomeTeamId())
-            wrongOrder = currGame.getHomeValuesUntil(startTime, endTime);
+            wrongOrder = currGame.getHomeValuesUntil(filter, startTime, endTime);
         else
-            wrongOrder = currGame.getAwayValuesUntil(startTime, endTime);
+            wrongOrder = currGame.getAwayValuesUntil(filter, startTime, endTime);
 
+        // List is in the wrong order
         return reverseList(wrongOrder);
     }
 
@@ -84,34 +88,38 @@ public class DatabaseAdapter
 
     void setGame(Context context, GameGovernor.GameGovernorData data, String gameID)
     {
+        // Set teams, with the game Id and save it in gameGovernor
         getTeamsForGame(data, gameID);
+        // Get init new DbGameHelper if necessary
         currGame = getCachedGames(context, gameID, data.homeTeam.getId());
 
+        // Get data from dbMeta and currGame
         getTeamData(data.homeTeam, currGame);
         getTeamData(data.awayTeam, currGame);
     }
 
     private void getTeamData(OPTA_Team team, DbGameHelper dbGame)
     {
-        if (team.dataFetched)
+        // Lazy check if the data got already fetched
+        if (team.getEvents() != null)
             return;
 
-        dbGame.getPlayerData(team); // Get player/lineup
-        dbGame.mapPlayerEvents(team); // Get Events
-        team.setEvents(dbGame.getTeamEvents(team.isHomeTeam())); // Game Data for teams
-        dbMeta.getPlayerNames(team); // Get Names
-        team.dataFetched = true;
+        dbGame.getPlayerData(team); // Get players and lineup
+        dbMeta.getPlayerNames(team); // Get player names
+        dbGame.getTeamEvents(team); // Game Events for teams - has to be last
     }
 
-    public OPTA_Team getGameDataFor(Context context, String gameID, OPTA_Team origTeam)
+    public OPTA_Team getGameDataForGameTeam(Context context, String gameID, OPTA_Team origTeam)
     {
-        if (!cachedGameTeams.containsKey(gameID + true) // Is game already cached?
+        // Is if  game already cached
+        if (!cachedGameTeams.containsKey(gameID + true)
                 || !cachedGameTeams.containsKey(gameID + false)) {
 
             // Get/Cache team meta-data for the game
-            OPTA_Team[] oldTeams = dbMeta.getTeam(gameID);
-            cachedGameTeams.put(gameID + true, oldTeams[0]);
-            cachedGameTeams.put(gameID + false, oldTeams[1]);
+            OPTA_Team[] oldTeams = dbMeta.getTeamsForGame(gameID);
+            cachedGameTeams.put(gameID + true, oldTeams[0]); // Save as homeTeam
+            cachedGameTeams.put(gameID + false, oldTeams[1]); // Save as awayTeam
+
             // Get/Cache team game-data for the game
             DbGameHelper gameData = getCachedGames(context, gameID, oldTeams[0].getId());
             getTeamData(oldTeams[0], gameData);
@@ -120,9 +128,24 @@ public class DatabaseAdapter
 
         // Return the right team
         OPTA_Team homeTeam = cachedGameTeams.get(gameID + true);
-        if (homeTeam.getTeamName().equals(origTeam.getTeamName()))
-            return homeTeam;
-        return cachedGameTeams.get(gameID + false);
+        return (homeTeam.getId() == origTeam.getId()) ? homeTeam : cachedGameTeams.get(gameID + false);
+    }
+
+    public void getAllGames(List<String> gameNames, List<Integer> gameIds)
+    {
+        dbMeta.getAllGames(gameNames, gameIds);
+    }
+
+    private void getTeamsForGame(GameGovernor.GameGovernorData data, String gameID)
+    {
+        // Check if game is already cached
+        if (!cachedGameTeams.containsKey(gameID + true)
+                || !cachedGameTeams.containsKey(gameID + false)) {
+
+            dbMeta.getTeamsForGame(data, gameID);
+            cachedGameTeams.put(gameID + true, data.homeTeam);
+            cachedGameTeams.put(gameID + false, data.awayTeam);
+        }
     }
 
     private DbGameHelper getCachedGames(Context context, String gameID, int homeTeamId)
@@ -130,17 +153,6 @@ public class DatabaseAdapter
         if (!cachedGames.containsKey(gameID)) // Lazy load gameData
             cachedGames.put(gameID, new DbGameHelper(context, gameID, homeTeamId));
         return cachedGames.get(gameID);
-    }
-
-    private void getTeamsForGame(GameGovernor.GameGovernorData data, String gameID)
-    {
-        if (!cachedGameTeams.containsKey(gameID + true)
-                || !cachedGameTeams.containsKey(gameID + false)) {
-
-            dbMeta.getTeam(data, gameID);
-            cachedGameTeams.put(gameID + true, data.homeTeam);
-            cachedGameTeams.put(gameID + false, data.awayTeam);
-        }
     }
 
     // Helper

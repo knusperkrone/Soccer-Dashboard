@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
@@ -7,12 +8,51 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pässe"/>
+        android:text="Passes"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText"/>
+
 
     <TextView
         android:id="@+id/team_paesse"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pässe"/>
+        android:text="Shoots"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:id="@+id/team_shoots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fouls"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:id="@+id/team_fouls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tackles"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:id="@+id/team_tackles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

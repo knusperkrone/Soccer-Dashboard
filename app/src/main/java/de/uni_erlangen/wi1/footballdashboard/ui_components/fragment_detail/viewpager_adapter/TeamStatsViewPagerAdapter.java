@@ -6,14 +6,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.FragmentPieExample;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team.ITeamFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team.TeamHeatMapFragment;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.team.TeamPassGraphFragment;
 
 /**
  * Created by knukro on 5/24/17.
- *
  */
 
 public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
@@ -47,32 +44,28 @@ public class TeamStatsViewPagerAdapter extends FragmentStatePagerAdapter
         switch (position) {
             case 0:
                 return TeamHeatMapFragment.newInstance(team);
-            case 1:
-                return TeamPassGraphFragment.newInstance(team);
-            case 2:
-                return FragmentPieExample.newInstance();
         }
-        throw new IllegalArgumentException("Size " + getCount() + " - request" + position);
+        throw new IllegalArgumentException("Size " + getCount() + " - request: " + position);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object)
     {
-        if (currFragment != null) {
-            currFragment.setInactive();
-        }
         if (object != currFragment) {
+            if (currFragment != null)
+                currFragment.setInactive();
+
             currFragment = (ITeamFragment) object;
+            currFragment.setActive();
         }
-        currFragment.setActive();
-        ;
         super.setPrimaryItem(container, position, object);
     }
 
     @Override
     public int getCount()
     {
-        return 3;
+        return 1;
     }
 
 }

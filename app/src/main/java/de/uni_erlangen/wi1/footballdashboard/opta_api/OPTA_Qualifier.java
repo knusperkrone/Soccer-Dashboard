@@ -1,5 +1,6 @@
 package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
+import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.DefaultQualifier;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Hand;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Attempt;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Leading_To_Goal;
@@ -18,7 +19,7 @@ public abstract class OPTA_Qualifier
 
     protected final String value;
 
-    public OPTA_Qualifier(String value)
+    protected OPTA_Qualifier(String value)
     {
         this.value = value;
     }
@@ -55,7 +56,7 @@ public abstract class OPTA_Qualifier
         }
         if (qualifier == null) {
             //Log.d("OPTA_QUALIFIER", "No newInstance() case for: " + id);
-            qualifier = new Overrun(value);
+            qualifier = new DefaultQualifier(value, id);
         }
         return qualifier;
     }

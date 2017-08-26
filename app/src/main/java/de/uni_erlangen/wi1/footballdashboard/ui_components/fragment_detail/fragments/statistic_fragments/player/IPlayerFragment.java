@@ -6,7 +6,6 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.OnSeekBarChan
 
 /**
  * Created by knukro on 6/20/17.
- *
  */
 
 public interface IPlayerFragment extends ActiveView, OnSeekBarChangeAble

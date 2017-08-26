@@ -1,16 +1,20 @@
 package de.uni_erlangen.wi1.footballdashboard.ui_components;
 
+import android.content.Context;
 import android.os.Handler;
-import android.support.annotation.ColorRes;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
-import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveTeamListAdapter;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.LiveActionListAdapter;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.OnSeekBarChangeAble;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.seekbar.RangeBarOnClickListener;
 
@@ -20,28 +24,25 @@ public class StatusBar
 
     private static StatusBar instance;
 
-    private final DatabaseAdapter dbAdapter = DatabaseAdapter.getInstance();
     private final GameGovernor governor = GameGovernor.getInstance();
-    private final RangeBarOnClickListener rangeListener;
     private final TextView teamLabel, timeLabel, goalLabel;
     private final Handler refreshHandler;
+    private final Context context;
     private final int[] currentRange;
+    private final int maxPeriodTime;
 
     private Clock clock;
-    private int maxPeriodTime;
-    private boolean showingHome;
-    public int shownTeamId = -1;
-
     private RangeSeekBar<Integer> rangeBar;
+    private boolean showingHome;
 
-    private LiveTeamListAdapter liveTeamListAdapter;
-    private OnSeekBarChangeAble liveSeekerChangeable;
-    private ColorRes res;
+    private final RangeBarOnClickListener rangeListener;
+    private final List<OnSeekBarChangeAble> registeredSeekBarChangeAbles = new ArrayList<>(4);
 
-    private StatusBar(Handler refreshHandler, TextView timeLabel, TextView goalLabel,
+    private StatusBar(Context context, Handler refreshHandler, TextView timeLabel, TextView goalLabel,
                       TextView teamLabel)
     {
         this.refreshHandler = refreshHandler;
+        this.context = context;
         this.teamLabel = teamLabel;
         this.timeLabel = timeLabel;
         this.goalLabel = goalLabel;
@@ -53,11 +54,11 @@ public class StatusBar
         rangeListener = new RangeBarOnClickListener(this);
     }
 
-    public static void initInstance(Handler handler, TextView timeLabel,
+    public static void initInstance(Context context, Handler handler, TextView timeLabel,
                                     TextView goalLabel, TextView teamLabel)
     {
         if (instance == null)
-            instance = new StatusBar(handler, timeLabel, goalLabel, teamLabel);
+            instance = new StatusBar(context, handler, timeLabel, goalLabel, teamLabel);
     }
 
     public static StatusBar getInstance()
@@ -69,11 +70,9 @@ public class StatusBar
     {
         if (position == 0) {
             showingHome = true;
-            shownTeamId = governor.getHomeTeamId();
             teamLabel.setText(governor.getHomeTeamName());
         } else {
             showingHome = false;
-            shownTeamId = governor.getAwayTeamId();
             teamLabel.setText(governor.getAwayTeamName());
         }
     }
@@ -106,39 +105,73 @@ public class StatusBar
     public void refreshTimeView()
     {
         timeLabel.setText(timeHR(currentRange[1]));
-        if (liveSeekerChangeable != null)
-            liveSeekerChangeable.seekBarChanged(currentRange[0], currentRange[1]);
-        if (liveTeamListAdapter != null)
-            dbAdapter.updateLiveList(liveTeamListAdapter, currentRange[1]);
+        updateRegisteredAdapters();
     }
 
-    public void setLiveTeamListAdapter(LiveTeamListAdapter adapter)
+    private void updateRegisteredAdapters()
     {
-        this.liveTeamListAdapter = adapter;
-        rangeListener.setLiveListAdapter(adapter);
+        // Update registered adapters
+        for (OnSeekBarChangeAble changeAble : registeredSeekBarChangeAbles)
+            changeAble.seekBarChanged(currentRange[0], currentRange[1]);
+        rangeListener.updateDatabaseAdapter(currentRange[1]);
+
+        // Update team
+        OPTA_Team homeTeam = governor.getHomeTeam();
+        OPTA_Team awayTeam = governor.getAwayTeam();
+        homeTeam.refreshUI(currentRange[1]);
+        awayTeam.refreshUI(currentRange[1]);
     }
 
-    public void unregisterLiveTeamAdaper(LiveTeamListAdapter adapter)
+    public void setLiveActionListAdapter(LiveActionListAdapter adapter)
     {
+        rangeListener.registerLiveListAdapter(adapter);
+    }
 
+    public void unregisterLiveActionListAdapter(LiveActionListAdapter adapter)
+    {
+        rangeListener.unregisterLiveListAdapter(adapter);
     }
 
     public void registerOnClicked(OnSeekBarChangeAble clickedView)
     {
-        this.liveSeekerChangeable = clickedView;
+        this.registeredSeekBarChangeAbles.add(clickedView);
     }
 
     public void unRegisterOnClicked(OnSeekBarChangeAble clickedView)
     {
-        this.liveSeekerChangeable = null;
+        this.registeredSeekBarChangeAbles.remove(clickedView);
     }
 
-    public void addGoal(boolean homeTeam)
+    public void increaseGameTime()
+    {
+        if (clock.timeIndex >= clock.TIME_FORWARD.length) {
+            makeToast("You can't go faster!");
+        } else {
+            clock.timeIndex++;
+            makeToast("Your speed is " + clock.TIME_FORWARD[clock.timeIndex] + " seconds");
+        }
+    }
+
+    public void decreaseGameTime()
+    {
+        if (clock.timeIndex == 0) {
+            makeToast("You can't go slower!");
+        } else {
+            clock.timeIndex--;
+            makeToast("Your speed is " + clock.TIME_FORWARD[clock.timeIndex] + " seconds");
+        }
+    }
+
+
+    public void setGoals(int goals, boolean homeTeam)
     {
         String[] currGoals = goalLabel.getText().toString().split(":");
-        int changedGoal = (homeTeam) ? 0 : 1;
-        currGoals[changedGoal] = "" + Integer.valueOf(currGoals[changedGoal]) + 1;
-        goalLabel.setText(currGoals[0] + " : " + currGoals[1]);
+
+        if (homeTeam)
+            goalLabel.setText(goals + ":" + currGoals[1]);
+        else
+            goalLabel.setText(currGoals[0] + ":" + goals);
+
     }
 
     public int getMinRange()
@@ -196,6 +229,9 @@ public class StatusBar
         private boolean stopped = false;
         private boolean dragged = false;
 
+        final int[] TIME_FORWARD = {1, 4, 10, 20, 30, 60, 120, 300}; // In seconds
+        int timeIndex = 2;
+
         @Override
         public void run()
         {
@@ -204,20 +240,20 @@ public class StatusBar
                 return;
             }
 
-            currentRange[1] += 10; // Time forward
+            currentRange[1] += TIME_FORWARD[timeIndex]; // Time forward
 
-            if (showingHome)
-                governor.getHomeTeam().updateLightColors(currentRange[1]);
-            else
-                governor.getAwayTeam().updateLightColors(currentRange[1]);
-
-            // Set new time to rangeBar
-            rangeBar.setSelectedMaxValue(currentRange[1]);
             // Update time-View and registered listeners
             refreshTimeView();
 
+            // Set new time to rangeBar
+            rangeBar.setSelectedMaxValue(currentRange[1]);
             refreshHandler.postDelayed(this, 1000);
         }
+    }
+
+    private void makeToast(String msg)
+    {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
     private static String timeHR(int currTime)

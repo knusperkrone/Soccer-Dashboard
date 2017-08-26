@@ -54,7 +54,7 @@ class DbMetaHelper extends SQLiteOpenHelper
     }
 
 
-    void getTeam(GameGovernor.GameGovernorData data, String gameId)
+    void getTeamsForGame(GameGovernor.GameGovernorData data, String gameId)
     {
         final String query = "SELECT thome.ID, thome.Name, taway.ID, taway.Name, first_half_length, second_half_length " +
                 " FROM Game " +
@@ -83,10 +83,10 @@ class DbMetaHelper extends SQLiteOpenHelper
         closeDatabase();
     }
 
-    OPTA_Team[] getTeam(String gameId)
+    OPTA_Team[] getTeamsForGame(String gameId)
     {
         GameGovernor.GameGovernorData tmp = new GameGovernor.GameGovernorData();
-        getTeam(tmp, gameId);
+        getTeamsForGame(tmp, gameId);
         return new OPTA_Team[]{tmp.homeTeam, tmp.awayTeam};
     }
 
@@ -108,9 +108,8 @@ class DbMetaHelper extends SQLiteOpenHelper
         Cursor cursor = mDatabase.rawQuery(getPlayers.toString(), new String[]{ });
         // Iterate over cursor
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            players.get(
-                    cursor.getInt(0)) // PlayerID
-                    .setName(cursor.getString(1), cursor.getString(2), cursor.getString(3)); // Name
+            players.get(cursor.getInt(0)) // Get player by Id
+                    .setName(cursor.getString(1), cursor.getString(2), cursor.getString(3)); // Set name
         }
 
         cursor.close();
@@ -145,6 +144,26 @@ class DbMetaHelper extends SQLiteOpenHelper
         return gameList;
     }
 
+    void getAllGames(List<String> gameNames, List<Integer> gameIds)
+    {
+        openDatabase();
+
+        Cursor cursor = mDatabase.rawQuery("SELECT game.id, t1.name, t2.name\n" +
+                "FROM game\n" +
+                "JOIN team AS t1\n" +
+                "\tON game.ID_Team_Away == t1.ID\n" +
+                "JOIN team AS t2\n" +
+                "\tON game.ID_Team_home == t2.ID", new String[]{ });
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            gameIds.add(cursor.getInt(0));
+            gameNames.add(cursor.getString(1) + " vs " + cursor.getString(2));
+        }
+
+        cursor.close();
+        closeDatabase();
+    }
+
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase)
@@ -157,4 +176,5 @@ class DbMetaHelper extends SQLiteOpenHelper
     {
 
     }
+
 }

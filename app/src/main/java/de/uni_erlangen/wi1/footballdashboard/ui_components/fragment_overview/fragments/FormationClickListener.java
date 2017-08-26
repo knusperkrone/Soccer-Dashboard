@@ -58,7 +58,7 @@ class FormationClickListener implements View.OnClickListener, OnSeekBarChangeAbl
     public void onClick(View view)
     {
         // Check if we already clicked that view, if yes, we reset the state
-        if (!team.setClicked(pView))
+        if (!team.OnClicked(pView))
             teamClickState.val = 0;
 
         // Register this as only active item

@@ -16,6 +16,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.ActiveView;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.viewpager_adapter.FormatViewPagerAdapter;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.ILiveFilter;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView;
 
@@ -26,6 +27,7 @@ public class FormationFragment extends Fragment implements ActiveView
     private final PlayerView[] playerViews;
     private MainListView mainListView;
     private OPTA_Team team;
+    private boolean homeTeam;
     private int layoutId;
 
     private final ReferenceHolder<FormationClickListener> clickedListener = new ReferenceHolder<>();
@@ -43,6 +45,7 @@ public class FormationFragment extends Fragment implements ActiveView
         frag.mainListView = mainListView;
         frag.team = (homeTeam) ? gov.getHomeTeam() : gov.getAwayTeam();
         frag.layoutId = layoutId;
+        frag.homeTeam = homeTeam;
 
         return frag;
     }
@@ -67,7 +70,7 @@ public class FormationFragment extends Fragment implements ActiveView
         playerViews[10] = (PlayerView) root.findViewById(R.id.p11);
 
         // Map views to team
-        team.setViews(playerViews);
+        team.setViews(playerViews, this);
 
         // Setup heatMap
         HeatMap heatMap = (HeatMap) root.findViewById(R.id.heatmap);
@@ -87,6 +90,24 @@ public class FormationFragment extends Fragment implements ActiveView
         }
 
         return root;
+    }
+
+    public void changeFormation(int optaId)
+    {
+        // Get new layoutId and call onCreateView()
+        int newLayoutId;
+        if (homeTeam) {
+            newLayoutId = FormatViewPagerAdapter.getHomeLayoutId(optaId);
+        } else {
+            newLayoutId = FormatViewPagerAdapter.getAwayLayoutId(optaId);
+        }
+
+        this.layoutId = newLayoutId;
+        getFragmentManager()
+                .beginTransaction()
+                .detach(this)
+                .attach(this)
+                .commit();
     }
 
 

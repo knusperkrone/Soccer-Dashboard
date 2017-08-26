@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.ILiveFilter;
 
 /**
  * Created by knukro on 6/16/17.
+ * .
  */
 
 class TimeList
@@ -33,7 +35,7 @@ class TimeList
         return outList;
     }
 
-    List<OPTA_Event> getValuesRange(int startTime, int endTime)
+    List<OPTA_Event> getValuesRange(ILiveFilter filter, int startTime, int endTime)
     {
         // Get index of first element.time >= startTime
         int i = 0;
@@ -51,8 +53,8 @@ class TimeList
                     currIndex = i;
                 break;
             }
-
-            outList.add(info);
+            if (filter.isValid(info))
+                outList.add(info);
         }
 
         return outList;

@@ -7,14 +7,12 @@ import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Team;
-import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.FragmentPieExample;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.IPlayerFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.LineChartFragment;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_detail.fragments.statistic_fragments.player.PlayerHeatmapFragment;
 
 /**
  * Created by knukro on 6/20/17.
- *
  */
 
 public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
@@ -22,7 +20,7 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
 
     private IPlayerFragment currFragment;
     private OPTA_Player player;
-    private OPTA_Team team;
+    private final OPTA_Team team;
 
     public PlayerStatsViewPagerAdapter(FragmentManager fm, OPTA_Team team, OPTA_Player player)
     {
@@ -38,11 +36,6 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
         currFragment.setActive();
     }
 
-    public void refreshActiveItem()
-    {
-        currFragment.setActive();
-    }
-
     @Override
     public Fragment getItem(int position)
     {
@@ -51,28 +44,28 @@ public class PlayerStatsViewPagerAdapter extends FragmentStatePagerAdapter
                 return PlayerHeatmapFragment.newInstance(player);
             case 1:
                 return LineChartFragment.newInstance(team, player);
-            case 2:
-                return FragmentPieExample.newInstance();
         }
-        throw new IllegalArgumentException("DEAD_CODE");
+        throw new IllegalArgumentException("Size " + getCount() + " - request: " + position);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object)
     {
-        if (currFragment != null) {
-            currFragment.setInactive();
-        }
         if (currFragment != object) {
+            if (currFragment != null) {
+                currFragment.setInactive();
+            }
+
             currFragment = ((IPlayerFragment) object);
+            currFragment.setActive();
         }
-        currFragment.setActive();
         super.setPrimaryItem(container, position, object);
     }
 
     @Override
     public int getCount()
     {
-        return 3;
+        return 2;
     }
 }

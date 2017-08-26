@@ -12,7 +12,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.cus
 public class OPTA_Player implements Comparable
 {
 
-    private enum Position
+    public enum Position
     {
         GOALKEEPER, DEFENDER, MIDFIELDER, STRIKER, SUBSTITUTE
     }
@@ -29,8 +29,8 @@ public class OPTA_Player implements Comparable
     private int rankingPoints = 60;
     private short cardIndicator = 0;
 
-    public final List<OPTA_Event> actions = new ArrayList<>();
-    public final List<Short> playerRankings = new ArrayList<>(90);
+    public final List<OPTA_Event> actions;
+    public final List<Short> playerRankings;
 
     PlayerView mappedView;
 
@@ -38,6 +38,15 @@ public class OPTA_Player implements Comparable
     public OPTA_Player(int id)
     {
         this.id = id;
+        actions = new ArrayList<>(128);
+        playerRankings = new ArrayList<>(90);
+    }
+
+    private OPTA_Player(int id, List<OPTA_Event> actions, List<Short> playerRankings)
+    {
+        this.id = id;
+        this.actions = actions;
+        this.playerRankings = playerRankings;
     }
 
     public void setName(String firstName, @Nullable String knownName, String lastName)
@@ -75,11 +84,6 @@ public class OPTA_Player implements Comparable
         }
     }
 
-    public void setPosition(String position)
-    {
-        setPosition(Integer.valueOf(position));
-    }
-
     public void changeRankingPoints(int value)
     {
         rankingPoints += value;
@@ -102,24 +106,29 @@ public class OPTA_Player implements Comparable
         this.layoutPosition = Integer.valueOf(layoutPos);
     }
 
+    public void setPosition(String position)
+    {
+        setPosition(Integer.valueOf(position));
+    }
+
+    public Position getPosition()
+    {
+        return position;
+    }
+
+    public int getRankingPoints()
+    {
+        return rankingPoints;
+    }
+
+    public List<OPTA_Event> getActions()
+    {
+        return actions;
+    }
+
     public void setCaptain(boolean isCaptain)
     {
         this.captain = isCaptain;
-    }
-
-    void setCardYellow()
-    {
-        cardIndicator = 1;
-    }
-
-    void setCardRed()
-    {
-        cardIndicator = 2;
-    }
-
-    public void removeAllCards()
-    {
-        cardIndicator = 0;
     }
 
     public boolean hasYellowCard()
@@ -147,16 +156,6 @@ public class OPTA_Player implements Comparable
         this.name = name;
     }
 
-    void setShirtNumber(int shirtNumber)
-    {
-        this.shirtNumber = shirtNumber;
-    }
-
-    void setLayoutPosition(int layoutPosition)
-    {
-        this.layoutPosition = layoutPosition;
-    }
-
     public void setPosition(Position position)
     {
         this.position = position;
@@ -177,24 +176,53 @@ public class OPTA_Player implements Comparable
         return shirtNumber;
     }
 
+    void removeAllCards()
+    {
+        cardIndicator = 0;
+        if (mappedView != null)
+            mappedView.setYellowCard(false);
+    }
+
+    void setShirtNumber(int shirtNumber)
+    {
+        this.shirtNumber = shirtNumber;
+    }
+
+    void setLayoutPosition(int layoutPosition)
+    {
+        this.layoutPosition = layoutPosition;
+    }
+
+    void setCardYellow()
+    {
+        cardIndicator = 1;
+        if (mappedView != null)
+            mappedView.setYellowCard(true);
+    }
+
+    void setCardRed()
+    {
+        cardIndicator = 2;
+    }
+
     int getLayoutPosition()
     {
         return layoutPosition;
     }
 
-    public Position getPosition()
-    {
-        return position;
-    }
 
-    public int getRankingPoints()
+    OPTA_Player pseudoClone()
     {
-        return rankingPoints;
-    }
-
-    public List<OPTA_Event> getActions()
-    {
-        return actions;
+        OPTA_Player tmp = new OPTA_Player(this.id, this.actions, this.playerRankings); // NOT CLONING LISTS
+        // Rest is cloning
+        tmp.name = this.name;
+        tmp.shirtNumber = this.shirtNumber;
+        tmp.layoutPosition = this.layoutPosition;
+        tmp.position = this.position;
+        tmp.captain = this.captain;
+        tmp.rankingPoints = this.rankingPoints;
+        tmp.cardIndicator = this.cardIndicator;
+        return tmp;
     }
 
     @Override

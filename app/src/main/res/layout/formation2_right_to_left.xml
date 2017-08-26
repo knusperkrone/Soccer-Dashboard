@@ -31,7 +31,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/goalkeeper_paddingsize_large">
+            android:paddingStart="@dimen/goalkeeper_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -54,7 +55,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines4_line_paddingsize_large">
+            android:paddingStart="@dimen/lines4_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -99,7 +101,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines4_line_paddingsize_large">
+            android:paddingStart="@dimen/lines4_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -143,7 +146,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines4_line_paddingsize_large">
+            android:paddingStart="@dimen/lines4_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"

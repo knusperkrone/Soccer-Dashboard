@@ -17,6 +17,7 @@ import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 public class HeatMapHelper
 {
 
+    // Weights of a heatmap point
     private static final double DEFAULT_POINT_VAL = 40;
     private static final double MIDDLE_POINT_VAL = 30;
     private static final double SMALL_POINT_VAL = 25;
@@ -40,8 +41,8 @@ public class HeatMapHelper
         heatMap.forceRefresh();
     }
 
-    public static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
-                                              boolean homeTeam, int startTime, int endTime)
+    private static void addDataPointsToHeatmap(@NonNull OPTA_Player player, @NonNull HeatMap heatMap,
+                                               boolean homeTeam, int startTime, int endTime)
     {
         addDataPointsToHeatmap(player, heatMap, homeTeam, startTime, endTime,
                 evaluatePointValue(startTime, endTime));
@@ -57,8 +58,8 @@ public class HeatMapHelper
             if (info.getCRTime() > endTime)
                 break; // That is to much now
 
-            float x = Double.valueOf(info.x / 100).floatValue();
-            float y = Double.valueOf(info.y / 100).floatValue();
+            float x = Double.valueOf(info.getX() / 100).floatValue();
+            float y = Double.valueOf(info.getY() / 100).floatValue();
 
             // Inverse x/y
             if (!homeTeam) x = 1.0f - x;

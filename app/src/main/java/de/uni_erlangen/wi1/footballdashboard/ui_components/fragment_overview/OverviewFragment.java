@@ -27,13 +27,14 @@ public class OverviewFragment extends Fragment implements ActiveView
     @Override
     public void setActive()
     {
+
     }
 
     @Override
     public void setInactive()
     {
-    }
 
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,5 +50,6 @@ public class OverviewFragment extends Fragment implements ActiveView
 
         return root;
     }
+
 
 }

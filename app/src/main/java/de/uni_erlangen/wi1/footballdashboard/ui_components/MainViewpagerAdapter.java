@@ -51,6 +51,7 @@ public class MainViewpagerAdapter extends FragmentStatePagerAdapter
             if (activeFragment != null) {
                 activeFragment.setInactive();
             }
+
             activeFragment = (ActiveView) object;
             activeFragment.setActive();
             mainList.setActive(position);

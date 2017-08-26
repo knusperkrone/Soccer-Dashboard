@@ -1,10 +1,13 @@
 package de.uni_erlangen.wi1.footballdashboard;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +19,9 @@ import android.widget.TextView;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
-import java.util.Timer;
-
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.DatabaseAdapter;
 import de.uni_erlangen.wi1.footballdashboard.database_adapter.GameGovernor;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.GamePicker;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.MainViewpagerAdapter;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.main_list.MainListView;
@@ -29,18 +31,12 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
 {
 
-    /*
-    TODO:
-    res/layout-sw600dp/main_activity.xml   # For 7” tablets (600dp wide and bigger)
-    res/layout-sw720dp/main_activity.xml   # For 10” tablets (720dp wide and bigger)
-     */
-
     private static boolean singleTon = false;
 
     private final FragmentManager fm = getSupportFragmentManager();
     private MainListView mainListView;
     private DrawerLayout drawer;
-    private Timer timer;
+    private StatusBar statusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,7 +57,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // ViewPager (Main-Content)
-
         VerticalViewPager mainViewPager = (VerticalViewPager) findViewById(R.id.main_viewpager);
         MainViewpagerAdapter adapter = new MainViewpagerAdapter(fm, mainListView);
         mainViewPager.setAdapter(adapter);
@@ -73,8 +68,9 @@ public class MainActivity extends AppCompatActivity
             return;
 
         DatabaseAdapter.initInstance(this);
-        //TODO: Parse Settings
-        GameGovernor.getInstance().setGame(this, "838532");
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String game = sp.getString("gameID", "838532");
+        GameGovernor.getInstance().setGame(this, game);
     }
 
     private void initStatusBar()
@@ -82,16 +78,14 @@ public class MainActivity extends AppCompatActivity
         if (singleTon)
             return;
 
-        if (timer == null)
-            timer = new Timer();
-        else
-            timer.cancel();
-
-        StatusBar.initInstance(new Handler(),
+        StatusBar.initInstance(
+                this,
+                new Handler(),
                 (TextView) findViewById(R.id.statusbar_time),
                 (TextView) findViewById(R.id.statusbar_goal),
                 (TextView) findViewById(R.id.statusbar_team));
-        StatusBar.getInstance().startClock();
+        statusBar = StatusBar.getInstance();
+        statusBar.startClock();
     }
 
     private void initMainList()
@@ -99,19 +93,24 @@ public class MainActivity extends AppCompatActivity
         mainListView = (MainListView) findViewById(R.id.list_placeholder);
     }
 
+    @SuppressWarnings("unchecked")
     private void initSeekBar()
     {
-        ImageButton seekerButton = (ImageButton) findViewById(R.id.start_button);
+        final ImageButton seekerButton = (ImageButton) findViewById(R.id.start_button);
         seekerButton.setOnClickListener(new View.OnClickListener()
         {
             private boolean clicked = false;
+
             @Override
             public void onClick(View view)
             {
-                if (clicked)
+                if (clicked) {
                     StatusBar.getInstance().startClock();
-                else
+                    seekerButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.button_play));
+                } else {
                     StatusBar.getInstance().stopClock();
+                    seekerButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.button_pause));
+                }
                 clicked = !clicked;
             }
         });
@@ -139,36 +138,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_settings:
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
         switch (id) {
-            case R.id.nav_camera:
-            case R.id.nav_gallery:
-            case R.id.nav_slideshow:
             case R.id.nav_manage:
-            case R.id.nav_share:
-            case R.id.nav_send:
+                drawer.closeDrawer(GravityCompat.START);
+                new GamePicker().show(getSupportFragmentManager(), "this");
+                break;
+
+            case R.id.nav_slow:
+                statusBar.decreaseGameTime();
+                break;
+
+            case R.id.nav_fast:
+                statusBar.increaseGameTime();
+                break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 

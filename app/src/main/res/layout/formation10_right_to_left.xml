@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/playfieldlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,7 +28,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/goalkeeper_paddingsize_large">
+            android:paddingStart="@dimen/goalkeeper_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -50,7 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines5_line_paddingsize_large">
+            android:paddingStart="@dimen/lines5_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -94,7 +97,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines5_line_paddingsize_large">
+            android:paddingStart="@dimen/lines5_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -131,7 +135,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines5_line_paddingsize_large">
+            android:paddingStart="@dimen/lines5_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"
@@ -161,7 +166,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/lines5_line_paddingsize_large">
+            android:paddingStart="@dimen/lines5_line_paddingsize_large"
+            tools:ignore="RtlSymmetry">
 
             <TableLayout
                 android:layout_width="@dimen/overviewplayer_size_large"

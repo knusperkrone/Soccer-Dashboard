@@ -3,7 +3,6 @@ package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.vi
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import de.uni_erlangen.wi1.footballdashboard.R;
@@ -23,9 +22,8 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
 
     private final MainListView mainList;
     private final StatusBar statusBar;
-    private int layoutHome, layoutAway;
+    private final int layoutHome, layoutAway;
     private ActiveView currFragment;
-
 
     public FormatViewPagerAdapter(FragmentManager fm, MainListView mainList)
     {
@@ -35,16 +33,6 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
         GameGovernor governor = GameGovernor.getInstance();
         this.layoutHome = getHomeLayoutId(governor.getHomeLayout());
         this.layoutAway = getAwayLayoutId(governor.getAwayLayout());
-    }
-
-    public void teamChangeFormation(boolean homeTeam, int newFormation)
-    {
-        if (homeTeam)
-            layoutHome = newFormation;
-        else
-            layoutAway = newFormation;
-        // TODO: Check if that works
-        notifyDataSetChanged();
     }
 
     @Override
@@ -76,8 +64,6 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
             currFragment.setActive();
         }
         super.setPrimaryItem(container, position, object);
-
-
     }
 
     @Override
@@ -86,67 +72,89 @@ public class FormatViewPagerAdapter extends FragmentStatePagerAdapter
         return 2;
     }
 
-    private static int getHomeLayoutId(int optaID)
+    public static int getHomeLayoutId(int optaID)
     {
-        // TODO:!!!!
         switch (optaID) {
             case 1:
+                break;
             case 2:
-                Log.d("FormationViewAdapter", "2lr");
                 return R.layout.formation2_left_to_right;
             case 3:
+                return R.layout.formation3_left_to_right;
             case 4:
-                Log.d("FormationViewAdapter", "4lr");
                 return R.layout.formation4_left_to_right;
             case 5:
+                return R.layout.formation5_left_to_right;
             case 6:
+                return R.layout.formation6_left_to_right;
             case 7:
+                return R.layout.formation7_left_to_right;
             case 8:
-                Log.d("FormationViewAdapter", "8lr");
                 return R.layout.formation8_left_to_right;
             case 9:
+                return R.layout.formation9_left_to_right;
             case 10:
+                return R.layout.formation10_left_to_right;
             case 11:
+                return R.layout.formation11_left_to_right;
             case 12:
+                return R.layout.formation12_left_to_right;
             case 13:
+                return R.layout.formation13_left_to_right;
             case 14:
+                return R.layout.formation14_left_to_right;
             case 15:
+                return R.layout.formation15_left_to_right;
             case 16:
+                return R.layout.formation16_left_to_right;
             case 17:
+                return R.layout.formation17_left_to_right;
             case 18:
+                return R.layout.formation18_left_to_right;
         }
         return R.layout.formation2_left_to_right;
     }
 
 
-    private static int getAwayLayoutId(int optaID)
+    public static int getAwayLayoutId(int optaID)
     {
-        // TODO:!!!!
         switch (optaID) {
             case 1:
+                break;
             case 2:
-                Log.d("FormationViewAdapter", "2rl");
                 return R.layout.formation2_right_to_left;
             case 3:
+                return R.layout.formation3_right_to_left;
             case 4:
-                Log.d("FormationViewAdapter", "4rl");
                 return R.layout.formation4_right_to_left;
             case 5:
+                return R.layout.formation5_right_to_left;
             case 6:
+                return R.layout.formation6_right_to_left;
             case 7:
+                return R.layout.formation7_right_to_left;
             case 8:
-                Log.d("FormationViewAdapter", "8rl");
                 return R.layout.formation8_right_to_left;
             case 9:
+                return R.layout.formation9_right_to_left;
             case 10:
+                return R.layout.formation10_right_to_left;
             case 11:
+                return R.layout.formation11_right_to_left;
             case 12:
+                return R.layout.formation12_right_to_left;
             case 13:
+                return R.layout.formation13_right_to_left;
             case 14:
+                return R.layout.formation14_right_to_left;
             case 15:
+                return R.layout.formation15_right_to_left;
             case 16:
+                return R.layout.formation16_right_to_left;
             case 17:
+                return R.layout.formation17_right_to_left;
             case 18:
+                return R.layout.formation18_right_to_left;
         }
         return R.layout.formation2_right_to_left;
     }

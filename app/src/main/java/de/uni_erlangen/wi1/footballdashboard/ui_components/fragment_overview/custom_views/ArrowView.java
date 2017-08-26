@@ -1,19 +1,24 @@
 package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 
 /**
- * Created by knukro on 6/28/17.
+ * Created by knukro on 6/28/17
+ * .
  */
+
 
 public class ArrowView extends View
 {
@@ -26,27 +31,56 @@ public class ArrowView extends View
     };
 
     // Holder for the X/Y coordinates
-    final static int[] startCoords = new int[2];
-    final static int[] endCoords = new int[2];
+    private final static int[] startCoords = new int[2];
+    private final static int[] endCoords = new int[2];
     // Graphic stuff
-    final static Paint linePaint = new Paint();
-    final static Paint headPaint = new Paint();
+    private final static Paint linePaint = new Paint();
+    private final static Paint headPaint = new Paint();
 
-    final PlayerView startView; // The selected player
-    final PlayerView[] players; // The other players
+    private int maxLineSize;
+    private int lineSizeFactor;
 
-    final SparseArray passCounter; // Holds the amount of passes between @startView and @players
-    final boolean centerOut; // Draw centerIn or centerOut flag
+    private PlayerView startView; // The selected player
+    private PlayerView[] players; // The other players
+
+    private SparseArray passCounter; // Holds the amount of passes between @startView and @players
+    private boolean centerOut; // Draw centerIn or centerOut flag
+
+    public ArrowView(Context context)
+    {
+        super(context);
+        init(context, startView, players, passCounter, centerOut);
+    }
+
+    public ArrowView(Context context, @Nullable AttributeSet attrs)
+    {
+        super(context, attrs);
+        init(context, startView, players, passCounter, centerOut);
+    }
+
+    public ArrowView(Context context, @Nullable AttributeSet attrs, int defStyleAttr)
+    {
+        super(context, attrs, defStyleAttr);
+        init(context, startView, players, passCounter, centerOut);
+    }
 
     public ArrowView(@NonNull Context context, @NonNull PlayerView startView,
                      @NonNull PlayerView[] players, @NonNull SparseArray passCounter,
                      boolean centerOut)
     {
         super(context);
+        init(context, startView, players, passCounter, centerOut);
+    }
+
+    private void init(Context context, PlayerView startView, PlayerView[] players, SparseArray passCounter, boolean centerOut)
+    {
         this.startView = startView;
         this.players = players;
         this.passCounter = passCounter;
         this.centerOut = centerOut;
+
+        getMaxLineSize(context);
+
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setAntiAlias(true);
         headPaint.setStyle(Paint.Style.FILL);
@@ -99,14 +133,15 @@ public class ArrowView extends View
         }
     }
 
+    @SuppressWarnings("unchecked")
     private int setStrokeCount(OPTA_Player player, int index)
     {
         // Extract the amount of passes, @player has done
         int count = (int) passCounter.get(player.getId(), 0);
-        if (count > 9)
-            count = 9;
+        if (count > maxLineSize)
+            count = maxLineSize;
 
-        linePaint.setStrokeWidth((float) count);
+        linePaint.setStrokeWidth((float) count * lineSizeFactor);
 
         // Choose color
         int color = mColors[index % mColors.length];
@@ -157,6 +192,31 @@ public class ArrowView extends View
         path.close();
 
         canvas.drawPath(path, headPaint);
+    }
+
+
+    private void getMaxLineSize(Context context)
+    {
+        int screenSize = context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        // TODO: Play with the values
+        switch (screenSize) {
+
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                this.maxLineSize = 9;
+                this.lineSizeFactor = 2;
+                break;
+
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                this.maxLineSize = 9;
+                this.lineSizeFactor = 1;
+                break;
+
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                this.maxLineSize = 9;
+                this.lineSizeFactor = 1;
+                break;
+        }
     }
 
 }

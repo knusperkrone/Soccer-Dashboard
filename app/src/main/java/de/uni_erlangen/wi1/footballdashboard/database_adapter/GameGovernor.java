@@ -16,7 +16,7 @@ public class GameGovernor
 {
 
     private static GameGovernor instance;
-    public final GameGovernorData data = new GameGovernorData();
+    private final GameGovernorData data = new GameGovernorData();
 
     private GameGovernor()
     {
@@ -61,8 +61,8 @@ public class GameGovernor
 
     public int getLatestEventTime()
     {
-        List<OPTA_Event> home = getHomeTeam().getEvents();
-        return home.get(home.size() - 1).getCRTime();
+        List<OPTA_Event> latestEvent = getHomeTeam().getEvents();
+        return latestEvent.get(latestEvent.size() - 1).getCRTime();
     }
 
     boolean isHomeTeamId(int teamId)
@@ -102,12 +102,12 @@ public class GameGovernor
 
     public int getHomeLayout()
     {
-        return data.homeTeam.layout;
+        return data.homeTeam.getLayoutId();
     }
 
     public int getAwayLayout()
     {
-        return data.awayTeam.layout;
+        return data.awayTeam.getLayoutId();
     }
 
 

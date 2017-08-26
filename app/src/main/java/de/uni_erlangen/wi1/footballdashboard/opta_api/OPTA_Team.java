@@ -1,7 +1,6 @@
 package de.uni_erlangen.wi1.footballdashboard.opta_api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -9,9 +8,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import de.uni_erlangen.wi1.footballdashboard.helper.EventParser;
+import de.uni_erlangen.wi1.footballdashboard.helper.StatisticHelper;
 import de.uni_erlangen.wi1.footballdashboard.helper.TeamFormationChange;
-import de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO.Pass;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.StatusBar;
 import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views.PlayerView;
+import de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.fragments.FormationFragment;
 
 
 public class OPTA_Team
@@ -21,38 +23,49 @@ public class OPTA_Team
     private final boolean homeTeam;
     private final String teamName;
 
-    public int layout;
-    public boolean dataFetched = false;
-
-    private final SparseArray<OPTA_Player> playerSparseArray;
     private final List<OPTA_Player[]> playerRankings = new ArrayList<>(6 * 90); // Every 10 seconds
+    private final List<OPTA_Event> uiEvents = new ArrayList<>();
 
+    private SparseArray<OPTA_Player> playerSparseArray;
     private List<OPTA_Event> events;
+
+    private OPTA_Player[] mappedPlayers;
     private PlayerView[] playerViews;
-    private OPTA_Player[] rankedPlayers;
+    private FormationFragment parentFragment;
+
+    private boolean reset = false;
+
+    private TeamFormationChange origFormation;
+    private TeamFormationChange currFormation;
+    private int teamGoals;
+    private int layoutId;
+
+    private int lastIndex = 0;
 
 
     public OPTA_Team(int teamId, String teamName, boolean homeTeam)
     {
         this.teamId = teamId;
-        this.homeTeam = homeTeam;
         this.teamName = teamName;
-        this.playerSparseArray = new SparseArray<>(22);
+        this.homeTeam = homeTeam;
     }
 
-    public void setViews(@NonNull PlayerView[] playerViews)
+    public void setViews(@NonNull PlayerView[] playerViews, FormationFragment parentFragment)
     {
         this.playerViews = playerViews;
-        mapToPlayerData();
+        this.parentFragment = parentFragment;
+        mapViewToPlayers();
     }
 
     public void setEvents(@NonNull List<OPTA_Event> events)
     {
         this.events = events;
+        mapPlayerEvents();
+        filterUIEvents();
         evaluateRanking();
     }
 
-    public boolean setClicked(PlayerView selectedView)
+    public boolean OnClicked(PlayerView selectedView)
     {
         /* Only selected view is clicked and returns
            true if player is already selected  */
@@ -77,26 +90,103 @@ public class OPTA_Team
         return playerRankings.get(index);
     }
 
-    public void resetCards()
+    public SparseArray getPassesBy(OPTA_Player giver, int minTime, int maxTime)
     {
-        //TODO:
+        return StatisticHelper.getPassesBy(new SparseArray(mappedPlayers.length), events, playerSparseArray, giver, minTime, maxTime);
     }
 
-    public void setYellowCard(int playerId)
+    public SparseArray getPassesFor(OPTA_Player receiver, int minTime, int maxTime)
     {
-        OPTA_Player player = playerSparseArray.get(playerId);
-        if (player != null)
-            player.setCardYellow();
+        return StatisticHelper.getPassesFor(new SparseArray(mappedPlayers.length), events, playerSparseArray, receiver, minTime, maxTime);
     }
 
-    public void setRedCard(int playerId)
+    public void resetAndRefreshUI(int maxTime)
     {
-        OPTA_Player player = playerSparseArray.get(playerId);
-        if (player != null)
-            player.setCardRed();
+        // Only reset when going backwards
+        int newIndex = 0;
+        for (OPTA_Event event : uiEvents) {
+            if (event.getCRTime() > maxTime)
+                break;
+            newIndex++;
+        }
+        if (lastIndex > newIndex) {
+            resetState();
+        }
+
+        refreshUI(maxTime);
     }
 
-    public void updateLightColors(int timeInSeconds)
+    public void refreshUI(int maxTime)
+    {
+        int goalCounter = -1;
+        TeamFormationChange newFormation = null;
+
+        int i = lastIndex;
+        for (; i < uiEvents.size(); i++) {
+            OPTA_Event event = uiEvents.get(i);
+
+            if (event.getCRTime() > maxTime)
+                break;
+
+            switch (event.getID()) {
+
+                case API_TYPE_IDS.CARD:
+                    for (OPTA_Qualifier qualifier : event.qualifiers) {
+                        if (qualifier.getId() == API_QUALIFIER_IDS.YELLOW_CARD) {
+                            setYellowCard(event.getPlayerId());
+                        } else if (qualifier.getId() == API_QUALIFIER_IDS.YELLOW_CARD) {
+                            setRedCard(event.getPlayerId());
+                        }
+                    }
+
+                case API_TYPE_IDS.GOAL:
+                    if (goalCounter == -1)
+                        goalCounter = 0;
+                    goalCounter++;
+                    break;
+
+                case API_TYPE_IDS.FORMATION_CHANGE:
+                    newFormation = EventParser.parseFormationChange(event, playerSparseArray.size());
+                    break;
+            }
+        }
+        lastIndex = i;
+
+        if (reset) {
+            reset = false;
+
+            if (newFormation == null && !origFormation.equals(currFormation))
+                newFormation = origFormation;
+
+            if (goalCounter == -1)
+                goalCounter = 0;
+        }
+
+        if (goalCounter != -1) {
+            teamGoals += goalCounter;
+            StatusBar.getInstance().setGoals(teamGoals, isHomeTeam());
+        }
+
+        if (newFormation != null) {
+            currFormation = newFormation;
+            teamFormationChanged(newFormation, playerSparseArray);
+        }
+
+        // Set circle (border) colors
+        updateLightColors(maxTime);
+    }
+
+
+    private void resetState()
+    {
+        reset = true;
+        lastIndex = teamGoals = 0;
+
+        for (OPTA_Player player : mappedPlayers)
+            player.removeAllCards();
+    }
+
+    private void updateLightColors(int timeInSeconds)
     {
         // Updates the views to their cached ranking @timeInSeconds
         OPTA_Player[] sortedPlayers = getRankedPlayers(timeInSeconds);
@@ -119,84 +209,49 @@ public class OPTA_Team
         }
     }
 
-    public void setNewTeamData(TeamFormationChange[] newPlayerData, int newCaptain)
+    private void teamFormationChanged(TeamFormationChange changeData, SparseArray<OPTA_Player> playerSparseArray)
     {
-        for (TeamFormationChange currPlayerData : newPlayerData) {
-            OPTA_Player currPlayer = playerSparseArray.get(currPlayerData.playerId);
+        // Iterate over the dataSet and change available values
+        for (int i = 0; i < changeData.size(); i++) {
+            OPTA_Player currPlayer = playerSparseArray.get(changeData.getPlayerId(i));
             // Set new values
-            currPlayer.setPosition(currPlayerData.position);
-            currPlayer.setShirtNumber(currPlayerData.jerseyNumber);
-            currPlayer.setLayoutPosition(currPlayerData.layoutPosition);
-            currPlayer.setCaptain(currPlayerData.playerId == newCaptain);
-        }
-    }
+            if (currPlayer != null) {
+                if (changeData.hasPosition())
+                    currPlayer.setPosition(changeData.getPosition(i));
 
-    public SparseArray getPassesBy(OPTA_Player giver, int minTime, int maxTime)
-    {
-        SparseArray ret = new SparseArray(rankedPlayers.length);
+                if (changeData.hasJerseyNumbers())
+                    currPlayer.setShirtNumber(changeData.getJerseyNumber(i));
 
-        boolean lastWasPass = false;
-        for (OPTA_Event currEvent : events) {
-            if (currEvent.getCRTime() < minTime)
-                continue; // Not quite there yet
+                if (changeData.hasLayoutPosition())
+                    currPlayer.setLayoutPosition(changeData.getLayoutPosition(i));
 
-            if (lastWasPass) {
-                //TODO: Filter out data noise
-                try {
-                    int recevierID = playerSparseArray.get(currEvent.getPlayerId()).getId();
-                    ret.put(recevierID, (int) ret.get(recevierID, 0) + 1);
-                    lastWasPass = false;
-                } catch (Exception e) {
-                    Log.d("PLAYER_TEAM", "Coulnd't find anything for: " + currEvent.getPlayerId());
-                }
+                if (changeData.hasCaptain())
+                    currPlayer.setCaptain(currPlayer.getId() == changeData.getCaptainId());
             }
-
-            if (currEvent.getCRTime() > maxTime)
-                break; // We are finished now
-
-            // Check if currEvent is a successful pass by the @giver player
-            if (currEvent instanceof Pass && currEvent.isSuccess()
-                    && currEvent.getPlayerId() == giver.getId())
-                lastWasPass = true;
         }
-        return ret;
+        if (changeData.hasLayoutId())
+            this.layoutId = changeData.getLayoutId();
+
+        // Only if this is an active game
+        if (parentFragment != null) {
+            parentFragment.changeFormation(layoutId);
+            mapViewToPlayers();
+        }
     }
 
-    public SparseArray getPassesFor(OPTA_Player receiver, int minTime, int maxTime)
-    {
-        SparseArray ret = new SparseArray(rankedPlayers.length);
 
-        OPTA_Event lastPass = null;
-        for (OPTA_Event currEvent : events) {
-            if (currEvent.getCRTime() < minTime)
-                continue; // Not quite there yet
-
-            // The last event was a successful pass and the next event.Id is @receiver id
-            if (lastPass != null && currEvent.getPlayerId() == receiver.getId()) {
-                int giverId = playerSparseArray.get(lastPass.getPlayerId()).getId();
-                ret.put(giverId, (int) ret.get(giverId, 0) + 1);
-                lastPass = null;
-            }
-
-            if (currEvent.getCRTime() > maxTime)
-                break; // We are finished now
-
-            if (currEvent instanceof Pass && currEvent.isSuccess())
-                lastPass = currEvent;
-        }
-
-        return ret;
-    }
-
-    private void mapToPlayerData()
+    /**
+     * Sorts the mappedPlayers array and save the original formation
+     */
+    private void mapViewToPlayers()
     {
         // Fill players Array
-        rankedPlayers = new OPTA_Player[playerSparseArray.size()];
+        mappedPlayers = new OPTA_Player[playerSparseArray.size()];
         for (int i = 0; i < playerSparseArray.size(); i++)
-            rankedPlayers[i] = playerSparseArray.valueAt(i);
+            mappedPlayers[i] = playerSparseArray.valueAt(i);
 
-        // Sort players layoutPosition
-        Arrays.sort(rankedPlayers, new Comparator<OPTA_Player>()
+        // Sort new array with layoutPosition
+        Arrays.sort(mappedPlayers, new Comparator<OPTA_Player>()
         {
             @Override
             public int compare(OPTA_Player p, OPTA_Player t1)
@@ -211,83 +266,180 @@ public class OPTA_Team
             }
         });
 
-        // Map view to Player
+        // Save a copy of the original formation
+        if (origFormation == null) {
+            saveOrigFormation(mappedPlayers);
+        }
+
+        // Maps the player data to the view references
         int i = 0;
+        // Iterate over the playerViews
         for (PlayerView playerView : playerViews) {
-            playerView.setMappedPlayer(rankedPlayers[i]);
-            rankedPlayers[i].mapView(playerView);
+
+            // Set the playerView to Data and the data to playerView
+            playerView.setMappedPlayer(mappedPlayers[i]);
+            mappedPlayers[i].mapView(playerView);
+
             i++;
         }
     }
 
+    /**
+     * Maps the team events to the players
+     */
+    private void mapPlayerEvents()
+    {
+        for (OPTA_Event event : events) {
+            OPTA_Player player = this.playerSparseArray.get(event.getPlayerId());
+            if (player != null) {
+                player.actions.add(event);
+            }
+        }
+    }
+
+
+    /***
+     * Filters out the relevant elements, for UI actions
+     */
+    private void filterUIEvents()
+    {
+        for (OPTA_Event event : events) {
+
+            switch (event.getID()) {
+                case API_TYPE_IDS.GOAL:
+                case API_TYPE_IDS.CARD:
+                case API_TYPE_IDS.FORMATION_CHANGE:
+                    uiEvents.add(event);
+            }
+
+        }
+    }
+
+    /**
+     * Iterate over all players until all are on the same time level, then sort them
+     * within their ranking and save the ranking Position for every 10 Seconds
+     */
     private void evaluateRanking()
     {
-        Log.d("OPTA_TEAM", getTeamName() + " Evaluating Team Rankings");
-        /*
-        Iterate over all players until all are on the same time level, then sort them
-        within their ranking and save the ranking Position for every 10 Seconds
-        */
-
-        // Fill a reference and index array for easy referencing and mapping
+        SparseArray<OPTA_Player> evaluationArray = new SparseArray<>(playerSparseArray.size());
+        // Array for easy iterating over players
         OPTA_Player[] players = new OPTA_Player[playerSparseArray.size()];
-        int[] lastEventIndex = new int[playerSparseArray.size()];
-        // Second arrays to sort and pass new sorted position
-        OPTA_Player[] sortPlayers = new OPTA_Player[playerSparseArray.size()];
-        // Map values
+        // Array for sorting position only
+        OPTA_Player[] sortedPlayers = new OPTA_Player[playerSparseArray.size()];
+
+        // Clone all players, to don't change their state
         for (int i = 0; i < playerSparseArray.size(); i++) {
-            players[i] = playerSparseArray.valueAt(i);
-            sortPlayers[i] = playerSparseArray.valueAt(i);
+            OPTA_Player clonedPlayer = playerSparseArray.valueAt(i).pseudoClone();
+            sortedPlayers[i] = players[i] = clonedPlayer;
+            evaluationArray.append(clonedPlayer.getId(), clonedPlayer);
         }
 
-        // Is every player at the end
+        // Save the last event we visited for each player
+        int[] lastEventIndex = new int[playerSparseArray.size()];
+        Arrays.fill(lastEventIndex, 0); // Unnecessary in Java
+        // Is every player finished
         boolean[] finished = new boolean[playerSparseArray.size()];
-        Arrays.fill(finished, false);
+        Arrays.fill(finished, false); // Unnecessary in Java
+        int parsedEventIndex = 0;
 
-        // Will be calculated every 10 Seconds
-        int currTime = 10;
+        // Time variables
+        final int TIME_FRAME = 10;
+        int currTime = TIME_FRAME;
 
         do {
+
+            // Check for layout changes
+            for (; parsedEventIndex < uiEvents.size(); parsedEventIndex++) {
+                OPTA_Event event = uiEvents.get(parsedEventIndex);
+                if (event.getCRTime() > currTime) {
+                    break;
+                }
+
+                if (event.getID() == API_TYPE_IDS.FORMATION_CHANGE) {
+                    // Change the states of all players
+                    teamFormationChanged(EventParser.parseFormationChange(event, playerSparseArray.size()),
+                            evaluationArray);
+                }
+            }
+
             // Start iteration over players
-            int i = 0;
+            int playerIndex = 0;
             for (OPTA_Player currPlayer : players) {
+                // Player already reached end of his events
+                if (finished[playerIndex]) {
+                    playerIndex++;
+                    continue;
+                }
+
                 List<OPTA_Event> actions = currPlayer.getActions();
-                // While we haven't finished all event's that in out time frame
-                while (lastEventIndex[i] < actions.size()) {
-                    OPTA_Event currEvent = currPlayer.getActions().get(lastEventIndex[i]);
+                // Evaluate event's that are inside the time frame
+                while (lastEventIndex[playerIndex] < actions.size()) {
+                    OPTA_Event currEvent = currPlayer.getActions().get(lastEventIndex[playerIndex]);
                     if (currEvent.getCRTime() > currTime)
                         break;
 
                     currEvent.calcRankingPoint(currPlayer); // Calc player Ranking
-                    lastEventIndex[i]++; // next Element
+                    lastEventIndex[playerIndex]++; // next Element
                 }
 
                 // Check if already finished all events
-                if (lastEventIndex[i] >= actions.size())
-                    finished[i] = true;
+                if (lastEventIndex[playerIndex] >= actions.size())
+                    finished[playerIndex] = true;
 
-                i++; // Go to next player
+                playerIndex++; // Go to next player
             }
 
             // Sort the array and save the state
-            Arrays.sort(sortPlayers);
+            Arrays.sort(sortedPlayers);
             for (short sortedPos = 0; sortedPos < players.length; sortedPos++) {
-                sortPlayers[sortedPos].playerRankings.add(sortedPos);
+                sortedPlayers[sortedPos].playerRankings.add(sortedPos); // Save position on player
             }
             // Save sortedPlayers state in rankings
-            playerRankings.add(sortPlayers.clone());
+            playerRankings.add(sortedPlayers.clone());
 
-            currTime += 10;
+            currTime += TIME_FRAME;
 
         } while (!allFinished(finished));
     }
 
+    private void saveOrigFormation(OPTA_Player[] startFormation)
+    {
+        origFormation = new TeamFormationChange(mappedPlayers.length);
+        origFormation.setLayoutId(this.layoutId);
+
+        int i = 0;
+        for (OPTA_Player player : startFormation) {
+            origFormation.setPlayerId(i, player.getId());
+            origFormation.setJerseyNumber(i, player.getShirtNumber());
+            origFormation.setPlayerLayoutPosition(i, player.getLayoutPosition());
+            origFormation.setPlayerPosition(i, player.getPosition().ordinal());
+            if (player.isCaptain()) {
+                origFormation.setCaptainId(player.getId());
+            }
+
+            i++;
+        }
+    }
+
+    // Helper for evaluateRanking
     private static boolean allFinished(boolean[] arr)
-    { // Helper for evaluateRanking
+    {
         for (boolean b : arr)
             if (!b)
                 return false;
         return true;
     }
+
+    private void setYellowCard(int playerId)
+    {
+        playerSparseArray.get(playerId).setCardYellow();
+    }
+
+    private void setRedCard(int playerId)
+    {
+        playerSparseArray.get(playerId).setCardRed();
+    }
+
 
     public String getPlayerName(int playerId)
     {
@@ -295,9 +447,9 @@ public class OPTA_Team
         return (tmp != null) ? tmp.getName() : null;
     }
 
-    public void setLayout(int layout)
+    public void setPlayers(SparseArray<OPTA_Player> playerSparseArray)
     {
-        this.layout = layout;
+        this.playerSparseArray = playerSparseArray;
     }
 
     public boolean isHomeTeam()
@@ -310,11 +462,6 @@ public class OPTA_Team
         selectedView.setDefaultMode();
     }
 
-    public SparseArray<OPTA_Player> getPlayers()
-    {
-        return playerSparseArray;
-    }
-
     public List<OPTA_Event> getEvents()
     {
         return events;
@@ -325,9 +472,24 @@ public class OPTA_Team
         return teamName;
     }
 
+    public SparseArray<OPTA_Player> getPlayers()
+    {
+        return this.playerSparseArray;
+    }
+
     public int getId()
     {
         return teamId;
+    }
+
+    public void setLayoutId(int layoutId)
+    {
+        this.layoutId = layoutId;
+    }
+
+    public int getLayoutId()
+    {
+        return this.layoutId;
     }
 
 }

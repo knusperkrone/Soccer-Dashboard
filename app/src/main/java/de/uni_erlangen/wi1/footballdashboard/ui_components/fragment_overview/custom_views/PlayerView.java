@@ -1,14 +1,12 @@
 package de.uni_erlangen.wi1.footballdashboard.ui_components.fragment_overview.custom_views;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,7 +24,7 @@ import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 public class PlayerView extends LinearLayout
 {
 
-    Paint paint = new Paint();
+    private final Paint paint = new Paint();
 
     public CircularImageView playerImage;
     private TextView playerName;
@@ -39,10 +37,23 @@ public class PlayerView extends LinearLayout
 
     private OPTA_Player mappedPlayer;
 
+    private static float heightOffset = -1;
+    private static float widthOffset = -1;
+
     public PlayerView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
         init();
+
+        if (heightOffset == -1) {
+            // get display size
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+            float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+            float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+            // TODO: Hope that is dynamic enough
+            heightOffset = (dpHeight / 100) * 2.5f;
+            widthOffset = -(dpWidth / 100) * 11f;
+        }
     }
 
     private void init()
@@ -119,7 +130,7 @@ public class PlayerView extends LinearLayout
         isBest = false;
     }
 
-    public int[] getBorderCoords(@NonNull int[] thisVector, int[] inVector)
+    public void getBorderCoords(@NonNull int[] thisVector, int[] inVector)
     {
         // Get Coordinates of playerImage center
         getMiddleCoords(thisVector);
@@ -137,17 +148,14 @@ public class PlayerView extends LinearLayout
         double circleY = thisVector[1] + circleWidth * Math.sin(angle);
         thisVector[0] = (int) Math.round(circleX);
         thisVector[1] = (int) Math.round(circleY);
-
-        return thisVector;
     }
 
-    public int[] getMiddleCoords(@NonNull int[] tmp)
+    public void getMiddleCoords(@NonNull int[] tmp)
     {
-        playerImage.getLocationOnScreen(tmp);
-        // TODO: Maybe calculate Center?
-        tmp[0] -= 115;
-        tmp[1] += 20;
-        return tmp;
+        playerImage.getLocationInWindow(tmp);
+        // TODO: HOPE THAT WORKS
+        tmp[0] += widthOffset;
+        tmp[1] += heightOffset;
     }
 
     private void setBorderColor(int colorID)
@@ -165,39 +173,12 @@ public class PlayerView extends LinearLayout
         playerImage.setColorFilter(null);
     }
 
-    private void setPlayerImage(@NonNull Drawable drawable)
-    {
-        try {
-            playerImage.setImageDrawable(drawable);
-        } catch (Exception e) {
-            //playerImage.setImageDrawable(); //TODO: Set default image
-        }
-    }
-
-    private void setPlayerImage(@Nullable Bitmap bm)
-    {
-        if (bm == null) {
-            //playerImage.setImageDrawable(); //TODO: Set default image
-        } else {
-            try {
-                playerImage.setImageBitmap(bm);
-            } catch (Exception e) {
-                //playerImage.setImageDrawable(); //TODO: Set default image
-            }
-        }
-    }
-
     public boolean isClickedMode()
     {
         return isClickedMode;
     }
 
-    private void setCaptain(boolean on)
-    {
-        indicatorCaptain.setVisibility(on ? VISIBLE : GONE);
-    }
-
-    private void setYellowCard(boolean on)
+    public void setYellowCard(boolean on)
     {
         indicatorCard.setVisibility(on ? VISIBLE : GONE);
     }
@@ -207,6 +188,10 @@ public class PlayerView extends LinearLayout
         return mappedPlayer;
     }
 
+    private void setCaptain(boolean on)
+    {
+        indicatorCaptain.setVisibility(on ? VISIBLE : GONE);
+    }
 
     // Helper to calculate angles
     private static double getAngle(int[] start, int[] target)

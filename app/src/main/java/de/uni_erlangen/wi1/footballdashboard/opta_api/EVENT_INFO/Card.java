@@ -2,6 +2,7 @@ package de.uni_erlangen.wi1.footballdashboard.opta_api.EVENT_INFO;
 
 import de.uni_erlangen.wi1.footballdashboard.opta_api.API_TYPE_IDS;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Event;
+import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Player;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.OPTA_Qualifier;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Red_Card;
 import de.uni_erlangen.wi1.footballdashboard.opta_api.QUALIFIERS.Second_Yellow;
@@ -24,6 +25,18 @@ public class Card extends OPTA_Event
     public int getID()
     {
         return API_TYPE_IDS.CARD;
+    }
+
+    @Override
+    public void calcRankingPoint(OPTA_Player player)
+    {
+        int value = (outcome) ? -10 : 0;
+
+        if (player.getPosition().equals(OPTA_Player.Position.DEFENDER)) {
+            value = (outcome) ? -11 : 0;
+        }
+
+        player.changeRankingPoints(value);
     }
 
     //outcome is always set to 1
